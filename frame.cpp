@@ -1,6 +1,10 @@
 #include <iostream>
-#include <conio.h>
-#include <windows.h>
+#include <unistd.h>
+#include <termios.h>
+#include <fcntl.h>
+#include <ctime>
+#include <cstdlib>
+
 using namespace std;
 #define H 20
 #define W 15
@@ -73,28 +77,66 @@ char blocks[][4][4] = {
 };
 
 int x=4,y=0,b=1;
+
+// --- CÁC HÀM HỖ TRỢ CHUẨN LINUX ---
 void gotoxy(int x, int y) {
-    COORD c = {x, y};
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), c);
+    cout << "\033[" << y + 1 << ";" << x + 1 << "H";
 }
+
+int kbhit(void) {
+    struct termios oldt, newt;
+    int ch;
+    int oldf;
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+    ch = getchar();
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    fcntl(STDIN_FILENO, F_SETFL, oldf);
+    if(ch != EOF) {
+        ungetc(ch, stdin);
+        return 1;
+    }
+    return 0;
+}
+
+char getch(void) {
+    char ch;
+    struct termios oldt, newt;
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    ch = getchar();
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    return ch;
+}
+// -----------------------------------
+
 void boardDelBlock(){
     for (int i = 0 ; i < 4 ; i++)
         for (int j = 0 ; j < 4 ; j++)
             if (blocks[b][i][j] != ' ' && y+j < H)
                 board[y+i][x+j] = ' ';
 }
+
 void block2Board(){
     for (int i = 0 ; i < 4 ; i++)
         for (int j = 0 ; j < 4 ; j++)
             if (blocks[b][i][j] != ' ' )
                 board[y+i][x+j] = blocks[b][i][j];
 }
+
 void initBoard(){
     for (int i = 0 ; i < H ; i++)
         for (int j = 0 ; j < W ; j++)
             if ((i==H-1) || (j==0) || (j == W-1)) board[i][j] = '#';
             else board[i][j] = ' ';
 }
+
 void draw(){
     gotoxy(0,0);
     for (int i = 0 ; i < H ; i++){
@@ -110,6 +152,7 @@ void draw(){
         cout << endl;
     }
 }
+
 bool canMove(int dx, int dy){
     for (int i = 0 ; i < 4 ; i++)
         for (int j = 0 ; j < 4 ; j++)
@@ -121,6 +164,7 @@ bool canMove(int dx, int dy){
             }
     return true;
 }
+
 void removeLine(){
     int j;
     for (int i = H-2; i >0 ; i-- ){
@@ -131,7 +175,7 @@ void removeLine(){
                 for (int j = 0; j < W-1 ; j++ ) board[ii][j] = board[ii-1][j];
             i++;
             draw();
-            _sleep(200);
+            usleep(200000); // Đã đổi _sleep thành usleep của Linux
         }
     }
 }
@@ -140,7 +184,7 @@ int main()
 {
     srand(time(0));
     b = rand() % 7;
-    system("cls");
+    system("clear"); // Đã đổi cls thành clear của Linux
     initBoard();
     while (1){
         boardDelBlock();
@@ -159,7 +203,7 @@ int main()
         }
         block2Board();
         draw();
-        _sleep(200);
+        usleep(200000); // Đã đổi _sleep thành usleep của Linux
     }
     return 0;
 }
