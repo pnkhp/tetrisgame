@@ -12,8 +12,8 @@ Chào mừng bạn đến với dự án **Tetris**! Đây là phiên bản tái
 - **High Score:** Lưu giữ kỷ lục người chơi cao nhất.
 
 ## 🛠️ Công nghệ sử dụng
-- **Ngôn ngữ:** [Ví dụ: C++ / Python / MIPS Assembly]
-- **Thư viện:** [Ví dụ: SFML / Pygame / Ncurses]
+- **Ngôn ngữ:**  C++ / Python 
+- **Thư viện:**  Pygame 
 - **Hệ điều hành:** Ưu tiên chạy tốt trên **Arch Linux** 🐧.
 
 ## 🚀 Hướng dẫn cài đặt & Chạy
@@ -48,7 +48,7 @@ Chào mừng bạn đến với dự án **Tetris**! Đây là phiên bản tái
 - **Vòng lặp Game (Game Loop):** Xử lý Input -> Cập nhật logic -> Vẽ (Render) để đảm bảo không bị giật lag.
 
 ## 🤝 Đóng góp
-Nếu em có ý tưởng nào để cải thiện thuật toán xử lý hàng gạch hoặc tối ưu hóa hiệu năng, đừng ngần ngại tạo một **Pull Request** nhé! 💡
+Nếu bạn có ý tưởng nào để cải thiện thuật toán xử lý hàng gạch hoặc tối ưu hóa hiệu năng, đừng ngần ngại tạo một **Pull Request** nhé! 💡
 
 ---
 ✨ Phát triển bởi IloveUS - Nhóm Sinh viên mạng máy tính UIT.
