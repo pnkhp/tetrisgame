@@ -20,7 +20,7 @@ Chào mừng bạn đến với dự án **Tetris**! Đây là phiên bản tái
 
 1. **Clone project:**
    ```bash
-   git clone [https://github.com/yourusername/tetris-game.git](https://github.com/yourusername/tetris-game.git)
+   git clone [https://github.com/pnkhp/tetrisgame)
    cd tetris-game
    ```
 
