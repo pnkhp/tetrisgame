@@ -1,5 +1,4 @@
 
-```markd
 # 🕹️ Tetris Classic Game
 
 Chào mừng bạn đến với dự án **Tetris**! Đây là phiên bản tái hiện lại trò chơi xếp gạch huyền thoại, được phát triển với mục tiêu học hỏi về tư duy lập trình logic, quản lý bộ nhớ và cấu trúc dữ liệu.
@@ -23,7 +22,6 @@ Chào mừng bạn đến với dự án **Tetris**! Đây là phiên bản tái
    git clone [https://github.com/pnkhp/tetrisgame)
    cd tetris-game
    ```
-
 2. **Cài đặt môi trường:**
    - Đảm bảo bạn đã cài đặt trình biên dịch phù hợp (ví dụ: `g++` hoặc `python3`).
    - Cài đặt thư viện phụ thuộc (nếu có).
@@ -52,9 +50,4 @@ Nếu bạn có ý tưởng nào để cải thiện thuật toán xử lý hàn
 
 ---
 ✨ Phát triển bởi IloveUS - Nhóm Sinh viên mạng máy tính UIT.
-```
-
----
-
-``` markd
 
