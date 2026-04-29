@@ -137,21 +137,44 @@ void initBoard(){
             else board[i][j] = ' ';
 }
 
+// --- HÀM VẼ ĐÃ ĐƯỢC CẬP NHẬT ĐỂ THÊM KHUNG ---
 void draw(){
     gotoxy(0,0);
+    
+    // Vẽ viền trên cùng (nắp đậy của game) và Viền trên của khung điều khiển
+    cout << "╔═";
+    for (int j = 1; j < W - 1; j++) cout << "══";
+    cout << "═╗   ╔══════════════════╗" << endl;
+
     for (int i = 0 ; i < H ; i++){
+        // Vẽ khu vực bảng Game
         for (int j = 0 ; j < W ; j++){
             if (board[i][j] == '#') {
-                cout << "##"; 
+                if (i == H - 1 && j == 0) cout << "╚═";
+                else if (i == H - 1 && j == W - 1) cout << "═╝";
+                else if (i == H - 1) cout << "══";
+                else if (j == 0) cout << "║ ";
+                else if (j == W - 1) cout << " ║";
             } else if (board[i][j] == ' ') {
                 cout << "  "; 
             } else {
                 cout << "[]"; 
             }
         }
+        
+        // Vẽ khung bảng điều khiển bên phải
+        if (i == 0)      cout << "   ║  BẢNG ĐIỀU KHIỂN ║";
+        else if (i == 1) cout << "   ╠══════════════════╣";
+        else if (i == 2) cout << "   ║ [A] : Sang trái  ║";
+        else if (i == 3) cout << "   ║ [D] : Sang phải  ║";
+        else if (i == 4) cout << "   ║ [X] : Rơi nhanh  ║";
+        else if (i == 5) cout << "   ║ [Q] : Thoát game ║";
+        else if (i == 6) cout << "   ╚══════════════════╝";
+        
         cout << endl;
     }
 }
+// ----------------------------------------------
 
 bool canMove(int dx, int dy){
     for (int i = 0 ; i < 4 ; i++)
@@ -175,7 +198,7 @@ void removeLine(){
                 for (int j = 0; j < W-1 ; j++ ) board[ii][j] = board[ii-1][j];
             i++;
             draw();
-            usleep(200000); // Đã đổi _sleep thành usleep của Linux
+            usleep(200000); 
         }
     }
 }
@@ -184,7 +207,7 @@ int main()
 {
     srand(time(0));
     b = rand() % 7;
-    system("clear"); // Đã đổi cls thành clear của Linux
+    system("clear"); 
     initBoard();
     while (1){
         boardDelBlock();
@@ -203,7 +226,7 @@ int main()
         }
         block2Board();
         draw();
-        usleep(200000); // Đã đổi _sleep thành usleep của Linux
+        usleep(200000); 
     }
     return 0;
 }
