@@ -1,9 +1,14 @@
 #include <iostream>
-#include <unistd.h>
-#include <termios.h>
-#include <fcntl.h>
 #include <ctime>
 #include <cstdlib>
+#ifdef _WIN32
+    #include <windows.h>
+    #include <conio.h>
+#else
+    #include <unistd.h>
+    #include <termios.h>
+    #include <fcntl.h>
+#endif
 
 using namespace std;
 #define H 20
@@ -78,12 +83,21 @@ char blocks[][4][4] = {
 
 int x=4,y=0,b=1;
 
-// --- CÁC HÀM HỖ TRỢ CHUẨN LINUX ---
 void gotoxy(int x, int y) {
+#ifdef _WIN32
+    COORD coord;
+    coord.X = x;
+    coord.Y = y;
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+#else
     cout << "\033[" << y + 1 << ";" << x + 1 << "H";
+#endif
 }
 
-int kbhit(void) {
+int check_kbhit(void) {
+#ifdef _WIN32
+    return _kbhit();
+#else
     struct termios oldt, newt;
     int ch;
     int oldf;
@@ -101,9 +115,13 @@ int kbhit(void) {
         return 1;
     }
     return 0;
+#endif
 }
 
-char getch(void) {
+char get_input(void) {
+#ifdef _WIN32
+    return _getch();
+#else
     char ch;
     struct termios oldt, newt;
     tcgetattr(STDIN_FILENO, &oldt);
@@ -113,6 +131,23 @@ char getch(void) {
     ch = getchar();
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
     return ch;
+#endif
+}
+
+void sleep_ms(int ms) {
+#ifdef _WIN32
+    Sleep(ms);
+#else
+    usleep(ms * 1000); 
+#endif
+}
+
+void clear_screen() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
 }
 // -----------------------------------
 
@@ -198,7 +233,7 @@ void removeLine(){
                 for (int j = 0; j < W-1 ; j++ ) board[ii][j] = board[ii-1][j];
             i++;
             draw();
-            usleep(200000); 
+            sleep_ms(200); 
         }
     }
 }
@@ -226,7 +261,7 @@ int main()
         }
         block2Board();
         draw();
-        usleep(200000); 
+        sleep_ms(200); 
     }
     return 0;
 }
