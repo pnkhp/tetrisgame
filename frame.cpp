@@ -113,6 +113,14 @@ void sleep_ms(int ms) {
 #endif
 }
 
+void clear_screen() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+}
+
 void boardDelBlock(){
     for (int i = 0 ; i < 4 ; i++)
         for (int j = 0 ; j < 4 ; j++)
@@ -153,7 +161,6 @@ void draw(){
             } else if (board[i][j] == ' ') {
                 cout << "  "; 
             } else {
-                // ÁP DỤNG MÀU CHO KHỐI
                 applyColor(board[i][j]);
                 cout << "[]" << RESET; 
             }
