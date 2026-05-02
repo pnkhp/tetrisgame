@@ -189,9 +189,9 @@ bool canMove(int dx, int dy){
             }
     return true;
 }
-
-void removeLine(){
+int removeLine(){
     int j;
+    int linesCleared = 0; 
     for (int i = H-2; i >0 ; i-- ){
         for (j = 1; j < W-1 ; j++)
             if (board[i][j] == ' ') break;
@@ -201,8 +201,10 @@ void removeLine(){
             i++;
             draw();
             sleep_ms(100); 
+            linesCleared++;
         }
     }
+    return linesCleared; 
 }
 
 int main()
@@ -212,7 +214,7 @@ int main()
     initBoard();
     
     int moveTimer = 0;
-    int dropLimit = 6; 
+    int dropLimit = 12; 
 
     while (1){
         boardDelBlock();
@@ -230,7 +232,14 @@ int main()
             if (canMove(0,1)) y++;
             else {
                 block2Board();
-                removeLine();
+                
+                
+                int lines = removeLine(); 
+                if (lines > 0) {
+                    dropLimit -= lines; 
+                    if (dropLimit < 1) dropLimit = 1; 
+                }
+                
                 x = 4; y = 0; b = rand() % 16;
                 if (!canMove(0,0)) break; 
             }
