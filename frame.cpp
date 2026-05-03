@@ -1,6 +1,8 @@
 #include <iostream>
 #include <ctime>
 #include <cstdlib>
+#include <cmath>
+#include <string>
 
 #ifdef _WIN32
     #include <windows.h>
@@ -37,6 +39,17 @@ char blocks[][4][4] = {
 };
 
 int x = 4, y = 0, b = 1;
+int score = 0;
+int totalLines = 0;
+
+// Tính điểm: 1 hàng = 36đ, mỗi hàng thêm nhân 3
+// 1 hàng: 36, 2 hàng: 36*3=108, 3 hàng: 36*9=324, 4 hàng: 36*27=972
+int calcScore(int lines) {
+    if (lines <= 0) return 0;
+    int pts = 36;
+    for (int i = 1; i < lines; i++) pts *= 3;
+    return pts;
+}
 
 void applyColor(char c) {
     switch(c) {
@@ -106,6 +119,13 @@ void sleep_ms(int ms) {
 #endif
 }
 
+// Căn phải chuỗi số vào độ rộng width, điền khoảng trắng bên trái
+string padLeft(int val, int width) {
+    string s = to_string(val);
+    while ((int)s.size() < width) s = " " + s;
+    return s;
+}
+
 void boardDelBlock() {
     for (int i = 0 ; i < 4 ; i++)
         for (int j = 0 ; j < 4 ; j++)
@@ -131,7 +151,7 @@ void draw() {
     gotoxy(0,0);
     cout << WHITE << "╔═";
     for (int j = 1; j < W - 1; j++) cout << "══";
-    cout << "═╗   ╔══════════════════╗" << endl;
+    cout << "═╗   ╔══════════════════╗" << RESET << endl;
 
     for (int i = 0 ; i < H ; i++){
         for (int j = 0 ; j < W ; j++){
@@ -151,14 +171,29 @@ void draw() {
             }
         }
 
-        if (i == 0)      cout << "   ║  BẢNG ĐIỀU KHIỂN ║";
-        else if (i == 1) cout << "   ╠══════════════════╣";
-        else if (i == 2) cout << "   ║ [A] : Sang trái  ║";
-        else if (i == 3) cout << "   ║ [D] : Sang phải  ║";
-        else if (i == 4) cout << "   ║ [W] : Xoay khối  ║";
-        else if (i == 5) cout << "   ║ [X] : Rơi nhanh  ║";
-        else if (i == 6) cout << "   ║ [Q] : Thoát game ║";
-        else if (i == 7) cout << "   ╚══════════════════╝";
+        // Panel bên phải
+        if      (i == 0)  cout << "   ║  BẢNG ĐIỀU KHIỂN ║";
+        else if (i == 1)  cout << "   ╠══════════════════╣";
+        else if (i == 2)  cout << "   ║ [A] : Sang trái  ║";
+        else if (i == 3)  cout << "   ║ [D] : Sang phải  ║";
+        else if (i == 4)  cout << "   ║ [W] : Xoay khối  ║";
+        else if (i == 5)  cout << "   ║ [X] : Rơi nhanh  ║";
+        else if (i == 6)  cout << "   ║ [Q] : Thoát game ║";
+        else if (i == 7)  cout << "   ╠══════════════════╣";
+        // --- Bảng điểm ---
+        else if (i == 8)  cout << "   ║    BẢNG ĐIỂM     ║";
+        else if (i == 9)  cout << "   ╠══════════════════╣";
+        else if (i == 10) cout << "   ║ Điểm:" << YELLOW
+                               << padLeft(score, 12) << RESET << " ║";
+        else if (i == 11) cout << "   ║ Hàng:" << GREEN
+                               << padLeft(totalLines, 12) << RESET << " ║";
+        else if (i == 12) cout << "   ╠══════════════════╣";
+        else if (i == 13) cout << "   ║ Combo:           ║";
+        else if (i == 14) cout << "   ║  1 hàng =  36đ   ║";
+        else if (i == 15) cout << "   ║  2 hàng = 108đ   ║";
+        else if (i == 16) cout << "   ║  3 hàng = 324đ   ║";
+        else if (i == 17) cout << "   ║  4 hàng = 972đ   ║";
+        else if (i == 18) cout << "   ╚══════════════════╝";
         cout << endl;
     }
 }
@@ -199,11 +234,9 @@ void rotateBlock() {
         for (int j = 0; j < 4; j++)
             rotated[i][j] = ' ';
 
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
             rotated[j][3 - i] = blocks[b][i][j];
-        }
-    }
 
     bool collision = false;
     for (int i = 0; i < 4; i++) {
@@ -220,16 +253,15 @@ void rotateBlock() {
         if (collision) break;
     }
 
-    if (!collision) {
+    if (!collision)
         for (int i = 0; i < 4; i++)
             for (int j = 0; j < 4; j++)
                 blocks[b][i][j] = rotated[i][j];
-    }
 }
 
 int main() {
     srand(time(0));
-    b = rand() % 8; // Điều chỉnh theo số lượng khối thực tế
+    b = rand() % 8;
     initBoard();
 
     int moveTimer = 0;
@@ -249,11 +281,17 @@ int main() {
 
         moveTimer++;
         if (moveTimer >= dropLimit) {
-            if (canMove(0,1)) y++;
-            else {
+            if (canMove(0,1)) {
+                y++;
+            } else {
                 block2Board();
                 int lines = removeLine();
                 if (lines > 0) {
+                    // Cộng điểm theo công thức: 1h=36, 2h=108, 3h=324, 4h=972
+                    score += calcScore(lines);
+                    totalLines += lines;
+
+                    // Tăng tốc độ theo số hàng đã xoá
                     dropLimit -= lines;
                     if (dropLimit < 1) dropLimit = 1;
                 }
@@ -267,5 +305,14 @@ int main() {
         draw();
         sleep_ms(30);
     }
+
+    // Màn hình kết thúc
+    gotoxy(0, H + 2);
+    cout << WHITE << "╔══════════════════════════════╗" << endl;
+    cout << "║         GAME OVER!           ║" << endl;
+    cout << "║  Điểm của bạn: " << YELLOW << padLeft(score, 8) << WHITE << "      ║" << endl;
+    cout << "║  Số hàng xoá:  " << GREEN  << padLeft(totalLines, 8) << WHITE << "      ║" << endl;
+    cout << "╚══════════════════════════════╝" << RESET << endl;
+
     return 0;
 }
