@@ -1,6 +1,7 @@
 #include <iostream>
 #include <ctime>
 #include <cstdlib>
+
 #ifdef _WIN32
     #include <windows.h>
     #include <conio.h>
@@ -23,19 +24,11 @@ using namespace std;
 #define BLUE    "\033[34m"
 #define WHITE   "\033[37m"
 
-char board[H][W] = {} ;
+char board[H][W] = {};
 char blocks[][4][4] = {
         {{' ','I',' ',' '}, {' ','I',' ',' '}, {' ','I',' ',' '}, {' ','I',' ',' '}},
-        {{' ','I',' ',' '}, {' ','I',' ',' '}, {' ','I',' ',' '}, {' ','I',' ',' '}},
-        {{' ',' ',' ',' '}, {' ','O','O',' '}, {' ','O','O',' '}, {' ',' ',' ',' '}},
-        {{' ',' ',' ',' '}, {' ','O','O',' '}, {' ','O','O',' '}, {' ',' ',' ',' '}},
-        {{' ',' ',' ',' '}, {' ','O','O',' '}, {' ','O','O',' '}, {' ',' ',' ',' '}},
-        {{' ',' ',' ',' '}, {' ','O','O',' '}, {' ','O','O',' '}, {' ',' ',' ',' '}},
-        {{' ',' ',' ',' '}, {' ','O','O',' '}, {' ','O','O',' '}, {' ',' ',' ',' '}},
-        {{' ',' ',' ',' '}, {' ','O','O',' '}, {' ','O','O',' '}, {' ',' ',' ',' '}},
         {{' ',' ',' ',' '}, {' ','O','O',' '}, {' ','O','O',' '}, {' ',' ',' ',' '}},
         {{' ',' ',' ',' '}, {'I','I','I','I'}, {' ',' ',' ',' '}, {' ',' ',' ',' '}},
-        {{' ',' ',' ',' '}, {' ','O','O',' '}, {' ','O','O',' '}, {' ',' ',' ',' '}},
         {{' ',' ',' ',' '}, {' ','T',' ',' '}, {'T','T','T',' '}, {' ',' ',' ',' '}},
         {{' ',' ',' ',' '}, {' ','S','S',' '}, {'S','S',' ',' '}, {' ',' ',' ',' '}},
         {{' ',' ',' ',' '}, {'Z','Z',' ',' '}, {' ','Z','Z',' '}, {' ',' ',' ',' '}},
@@ -43,7 +36,7 @@ char blocks[][4][4] = {
         {{' ',' ',' ',' '}, {' ',' ','L',' '}, {'L','L','L',' '}, {' ',' ',' ',' '}}
 };
 
-int x=4,y=0,b=1;
+int x = 4, y = 0, b = 1;
 
 void applyColor(char c) {
     switch(c) {
@@ -113,36 +106,28 @@ void sleep_ms(int ms) {
 #endif
 }
 
-void clear_screen() {
-#ifdef _WIN32
-    system("cls");
-#else
-    system("clear");
-#endif
-}
-
-void boardDelBlock(){
+void boardDelBlock() {
     for (int i = 0 ; i < 4 ; i++)
         for (int j = 0 ; j < 4 ; j++)
             if (blocks[b][i][j] != ' ' && y+i < H)
                 board[y+i][x+j] = ' ';
 }
 
-void block2Board(){
+void block2Board() {
     for (int i = 0 ; i < 4 ; i++)
         for (int j = 0 ; j < 4 ; j++)
             if (blocks[b][i][j] != ' ' )
                 board[y+i][x+j] = blocks[b][i][j];
 }
 
-void initBoard(){
+void initBoard() {
     for (int i = 0 ; i < H ; i++)
         for (int j = 0 ; j < W ; j++)
             if ((i==H-1) || (j==0) || (j == W-1)) board[i][j] = '#';
             else board[i][j] = ' ';
 }
 
-void draw(){
+void draw() {
     gotoxy(0,0);
     cout << WHITE << "╔═";
     for (int j = 1; j < W - 1; j++) cout << "══";
@@ -174,12 +159,11 @@ void draw(){
         else if (i == 5) cout << "   ║ [X] : Rơi nhanh  ║";
         else if (i == 6) cout << "   ║ [Q] : Thoát game ║";
         else if (i == 7) cout << "   ╚══════════════════╝";
-
         cout << endl;
     }
 }
 
-bool canMove(int dx, int dy){
+bool canMove(int dx, int dy) {
     for (int i = 0 ; i < 4 ; i++)
         for (int j = 0 ; j < 4 ; j++)
             if (blocks[b][i][j] != ' '){
@@ -190,14 +174,15 @@ bool canMove(int dx, int dy){
             }
     return true;
 }
-int removeLine(){
-    int j;
+
+int removeLine() {
     int linesCleared = 0;
-    for (int i = H-2; i >0 ; i-- ){
+    for (int i = H-2; i > 0 ; i-- ) {
+        int j;
         for (j = 1; j < W-1 ; j++)
             if (board[i][j] == ' ') break;
-        if (j == W-1){
-            for (int ii = i; ii >0 ; ii-- )
+        if (j == W-1) {
+            for (int ii = i; ii > 0 ; ii-- )
                 for (int jj = 1; jj < W-1 ; jj++ ) board[ii][jj] = board[ii-1][jj];
             i++;
             draw();
@@ -213,11 +198,13 @@ void rotateBlock() {
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 4; j++)
             rotated[i][j] = ' ';
+
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             rotated[j][3 - i] = blocks[b][i][j];
         }
     }
+
     bool collision = false;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
@@ -232,6 +219,7 @@ void rotateBlock() {
         }
         if (collision) break;
     }
+
     if (!collision) {
         for (int i = 0; i < 4; i++)
             for (int j = 0; j < 4; j++)
@@ -239,23 +227,22 @@ void rotateBlock() {
     }
 }
 
-int main()
-{
+int main() {
     srand(time(0));
-    b = rand() % 16;
+    b = rand() % 8; // Điều chỉnh theo số lượng khối thực tế
     initBoard();
 
     int moveTimer = 0;
     int dropLimit = 12;
 
-    while (1){
+    while (1) {
         boardDelBlock();
 
-        if (check_kbhit()){
+        if (check_kbhit()) {
             char c = get_input();
             if ((c=='a' || c=='A') && canMove(-1,0)) x--;
-            if ((c=='d' || c=='D') && canMove(1,0) ) x++;
-            if ((c=='x' || c=='X') && canMove(0,1))  y++;
+            if ((c=='d' || c=='D') && canMove(1,0)) x++;
+            if ((c=='x' || c=='X') && canMove(0,1)) y++;
             if (c=='w' || c=='W') rotateBlock();
             if (c=='q' || c=='Q') break;
         }
@@ -265,15 +252,12 @@ int main()
             if (canMove(0,1)) y++;
             else {
                 block2Board();
-
-
                 int lines = removeLine();
                 if (lines > 0) {
                     dropLimit -= lines;
                     if (dropLimit < 1) dropLimit = 1;
                 }
-
-                x = 4; y = 0; b = rand() % 16;
+                x = 4; y = 0; b = rand() % 8;
                 if (!canMove(0,0)) break;
             }
             moveTimer = 0;
