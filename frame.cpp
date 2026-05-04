@@ -346,9 +346,9 @@ int main() {
     gotoxy(0, H + 2);
     cout << WHITE << "╔══════════════════════════════╗" << endl;
     cout << "║        GAME OVER!            ║" << endl;
-    cout << "║  Kỷ lục:       " << RED    << padLeft(highScore, 8) << WHITE << "      ║" << endl;
-    cout << "║  Điểm của bạn: " << YELLOW << padLeft(score, 8)     << WHITE << "      ║" << endl;
-    cout << "║  Số hàng xoá:  " << GREEN  << padLeft(totalLines, 8)<< WHITE << "      ║" << endl;
+    cout << "║  Kỷ lục:       " << RED    << padLeft(highScore, 7) << WHITE << "      ║" << endl;
+    cout << "║  Điểm của bạn: " << YELLOW << padLeft(score, 7)     << WHITE << "      ║" << endl;
+    cout << "║  Số hàng xoá:  " << GREEN  << padLeft(totalLines, 7)<< WHITE << "      ║" << endl;
     cout << "╚══════════════════════════════╝" << RESET << endl;
 
     return 0;
