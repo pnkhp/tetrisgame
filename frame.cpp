@@ -1,8 +1,8 @@
 #include <iostream>
 #include <ctime>
 #include <cstdlib>
-#include <cmath>
 #include <string>
+#include <fstream> 
 
 #ifdef _WIN32
     #include <windows.h>
@@ -41,15 +41,33 @@ char currentBlock[4][4];
 
 int x = 4, y = 0, b = 1;
 int score = 0;
+int highScore = 0; // Biến lưu kỷ lục
 int totalLines = 0;
 
-// Tính điểm: 1 hàng = 36đ, mỗi hàng thêm nhân 3
-// 1 hàng: 36, 2 hàng: 36*3=108, 3 hàng: 36*9=324, 4 hàng: 36*27=972
+// Tính điểm
 int calcScore(int lines) {
     if (lines <= 0) return 0;
     int pts = 36;
     for (int i = 1; i < lines; i++) pts *= 3;
     return pts;
+}
+
+// Đọc kỷ lục từ file
+void loadHighScore() {
+    ifstream file("highscore.txt");
+    if (file.is_open()) {
+        file >> highScore;
+        file.close();
+    }
+}
+
+// Lưu kỷ lục vào file
+void saveHighScore() {
+    ofstream file("highscore.txt");
+    if (file.is_open()) {
+        file << highScore;
+        file.close();
+    }
 }
 
 void applyColor(char c) {
@@ -120,7 +138,6 @@ void sleep_ms(int ms) {
 #endif
 }
 
-// Căn phải chuỗi số vào độ rộng width, điền khoảng trắng bên trái
 string padLeft(int val, int width) {
     string s = to_string(val);
     while ((int)s.size() < width) s = " " + s;
@@ -172,7 +189,7 @@ void draw() {
             }
         }
 
-        // Panel bên phải
+        // Panel bên phải 
         if      (i == 0)  cout << "   ║  BẢNG ĐIỀU KHIỂN ║";
         else if (i == 1)  cout << "   ╠══════════════════╣";
         else if (i == 2)  cout << "   ║ [A] : Sang trái  ║";
@@ -184,17 +201,16 @@ void draw() {
         // --- Bảng điểm ---
         else if (i == 8)  cout << "   ║    BẢNG ĐIỂM     ║";
         else if (i == 9)  cout << "   ╠══════════════════╣";
-        else if (i == 10) cout << "   ║ Điểm:" << YELLOW
-                               << padLeft(score, 11) << RESET << " ║";
-        else if (i == 11) cout << "   ║ Hàng:" << GREEN
-                               << padLeft(totalLines, 11) << RESET << " ║";
-        else if (i == 12) cout << "   ╠══════════════════╣";
-        else if (i == 13) cout << "   ║ Combo:           ║";
-        else if (i == 14) cout << "   ║  1 hàng =  36đ   ║";
-        else if (i == 15) cout << "   ║  2 hàng = 108đ   ║";
-        else if (i == 16) cout << "   ║  3 hàng = 324đ   ║";
-        else if (i == 17) cout << "   ║  4 hàng = 972đ   ║";
-        else if (i == 18) cout << "   ╚══════════════════╝";
+        else if (i == 10) cout << "   ║ K.Lục:" << RED    << padLeft(highScore, 11)  << RESET << " ║";
+        else if (i == 11) cout << "   ║ Điểm :" << YELLOW << padLeft(score, 11)      << RESET << " ║";
+        else if (i == 12) cout << "   ║ Hàng :" << GREEN  << padLeft(totalLines, 11) << RESET << " ║";
+        else if (i == 13) cout << "   ╠══════════════════╣";
+        else if (i == 14) cout << "   ║ Combo:           ║";
+        else if (i == 15) cout << "   ║  1 hàng =  36đ   ║";
+        else if (i == 16) cout << "   ║  2 hàng = 108đ   ║";
+        else if (i == 17) cout << "   ║  3 hàng = 324đ   ║";
+        else if (i == 18) cout << "   ║  4 hàng = 972đ   ║";
+        else if (i == 19) cout << "   ╚══════════════════╝";
         cout << endl;
     }
 }
@@ -273,6 +289,9 @@ void spawnBlock() {
 
 int main() {
     srand(time(0));
+    
+    loadHighScore(); // Tải kỷ lục khi mở game
+    
     initBoard();
     spawnBlock();
 
@@ -299,11 +318,14 @@ int main() {
                 block2Board();
                 int lines = removeLine();
                 if (lines > 0) {
-                    // Cộng điểm theo công thức: 1h=36, 2h=108, 3h=324, 4h=972
                     score += calcScore(lines);
                     totalLines += lines;
+                    
+                    // Cập nhật kỷ lục ngay lập tức nếu vượt
+                    if (score > highScore) {
+                        highScore = score;
+                    }
 
-                    // Tăng tốc độ theo số hàng đã xoá
                     dropLimit -= lines;
                     if (dropLimit < 1) dropLimit = 1;
                 }
@@ -317,13 +339,16 @@ int main() {
         draw();
         sleep_ms(30);
     }
+    
+    saveHighScore(); // Lưu lại kỷ lục khi kết thúc game
 
-    // Màn hình kết thúc
+
     gotoxy(0, H + 2);
     cout << WHITE << "╔══════════════════════════════╗" << endl;
-    cout << "║         GAME OVER!           ║" << endl;
-    cout << "║  Điểm của bạn: " << YELLOW << padLeft(score, 8) << WHITE << "      ║" << endl;
-    cout << "║  Số hàng xoá:  " << GREEN  << padLeft(totalLines, 8) << WHITE << "      ║" << endl;
+    cout << "║        GAME OVER!            ║" << endl;
+    cout << "║  Kỷ lục:       " << RED    << padLeft(highScore, 8) << WHITE << "      ║" << endl;
+    cout << "║  Điểm của bạn: " << YELLOW << padLeft(score, 8)     << WHITE << "      ║" << endl;
+    cout << "║  Số hàng xoá:  " << GREEN  << padLeft(totalLines, 8)<< WHITE << "      ║" << endl;
     cout << "╚══════════════════════════════╝" << RESET << endl;
 
     return 0;
