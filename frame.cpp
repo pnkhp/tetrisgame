@@ -37,6 +37,7 @@ char blocks[][4][4] = {
         {{' ',' ',' ',' '}, {'J',' ',' ',' '}, {'J','J','J',' '}, {' ',' ',' ',' '}},
         {{' ',' ',' ',' '}, {' ',' ','L',' '}, {'L','L','L',' '}, {' ',' ',' ',' '}}
 };
+char currentBlock[4][4];
 
 int x = 4, y = 0, b = 1;
 int score = 0;
@@ -129,15 +130,15 @@ string padLeft(int val, int width) {
 void boardDelBlock() {
     for (int i = 0 ; i < 4 ; i++)
         for (int j = 0 ; j < 4 ; j++)
-            if (blocks[b][i][j] != ' ' && y+i < H)
+            if (currentBlock[i][j] != ' ' && y+i < H)
                 board[y+i][x+j] = ' ';
 }
 
 void block2Board() {
     for (int i = 0 ; i < 4 ; i++)
         for (int j = 0 ; j < 4 ; j++)
-            if (blocks[b][i][j] != ' ' )
-                board[y+i][x+j] = blocks[b][i][j];
+            if (currentBlock[i][j] != ' ' )
+                board[y+i][x+j] = currentBlock[i][j];
 }
 
 void initBoard() {
@@ -201,7 +202,7 @@ void draw() {
 bool canMove(int dx, int dy) {
     for (int i = 0 ; i < 4 ; i++)
         for (int j = 0 ; j < 4 ; j++)
-            if (blocks[b][i][j] != ' '){
+            if (currentBlock[i][j] != ' '){
                 int tx = x + j + dx;
                 int ty = y + i + dy;
                 if ( tx<1 || tx >= W-1 || ty >= H-1) return false;
@@ -236,7 +237,7 @@ void rotateBlock() {
 
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 4; j++)
-            rotated[j][3 - i] = blocks[b][i][j];
+            rotated[j][3 - i] = currentBlock[i][j];
 
     bool collision = false;
     for (int i = 0; i < 4; i++) {
@@ -256,13 +257,24 @@ void rotateBlock() {
     if (!collision)
         for (int i = 0; i < 4; i++)
             for (int j = 0; j < 4; j++)
-                blocks[b][i][j] = rotated[i][j];
+                currentBlock[i][j] = rotated[i][j];
+}
+
+void spawnBlock() {
+    x = 4; 
+    y = 0; 
+    b = rand() % 8;
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            currentBlock[i][j] = blocks[b][i][j];
+        }
+    }
 }
 
 int main() {
     srand(time(0));
-    b = rand() % 8;
     initBoard();
+    spawnBlock();
 
     int moveTimer = 0;
     int dropLimit = 12;
@@ -295,7 +307,7 @@ int main() {
                     dropLimit -= lines;
                     if (dropLimit < 1) dropLimit = 1;
                 }
-                x = 4; y = 0; b = rand() % 8;
+                spawnBlock();
                 if (!canMove(0,0)) break;
             }
             moveTimer = 0;
