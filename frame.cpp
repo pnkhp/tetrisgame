@@ -201,9 +201,9 @@ void draw() {
         // --- Bảng điểm ---
         else if (i == 8)  cout << "   ║    BẢNG ĐIỂM     ║";
         else if (i == 9)  cout << "   ╠══════════════════╣";
-        else if (i == 10) cout << "   ║ K.Lục:" << RED    << padLeft(highScore, 11)  << RESET << " ║";
-        else if (i == 11) cout << "   ║ Điểm :" << YELLOW << padLeft(score, 11)      << RESET << " ║";
-        else if (i == 12) cout << "   ║ Hàng :" << GREEN  << padLeft(totalLines, 11) << RESET << " ║";
+        else if (i == 10) cout << "   ║ K.Lục:" << RED    << padLeft(highScore, 10)  << RESET << " ║";
+        else if (i == 11) cout << "   ║ Điểm :" << YELLOW << padLeft(score, 10)      << RESET << " ║";
+        else if (i == 12) cout << "   ║ Hàng :" << GREEN  << padLeft(totalLines, 10) << RESET << " ║";
         else if (i == 13) cout << "   ╠══════════════════╣";
         else if (i == 14) cout << "   ║ Combo:           ║";
         else if (i == 15) cout << "   ║  1 hàng =  36đ   ║";
@@ -346,9 +346,9 @@ int main() {
     gotoxy(0, H + 2);
     cout << WHITE << "╔══════════════════════════════╗" << endl;
     cout << "║        GAME OVER!            ║" << endl;
-    cout << "║  Kỷ lục:       " << RED    << padLeft(highScore, 7) << WHITE << "      ║" << endl;
-    cout << "║  Điểm của bạn: " << YELLOW << padLeft(score, 7)     << WHITE << "      ║" << endl;
-    cout << "║  Số hàng xoá:  " << GREEN  << padLeft(totalLines, 7)<< WHITE << "      ║" << endl;
+    cout << "║  Kỷ lục:       " << RED    << padLeft(highScore, 8) << WHITE << "      ║" << endl;
+    cout << "║  Điểm của bạn: " << YELLOW << padLeft(score, 8)     << WHITE << "      ║" << endl;
+    cout << "║  Số hàng xoá:  " << GREEN  << padLeft(totalLines, 8)<< WHITE << "      ║" << endl;
     cout << "╚══════════════════════════════╝" << RESET << endl;
 
     return 0;
