@@ -184,9 +184,9 @@ void draw() {
         else if (i == 8)  cout << "   ║    BẢNG ĐIỂM     ║";
         else if (i == 9)  cout << "   ╠══════════════════╣";
         else if (i == 10) cout << "   ║ Điểm:" << YELLOW
-                               << padLeft(score, 12) << RESET << " ║";
+                               << padLeft(score, 11) << RESET << " ║";
         else if (i == 11) cout << "   ║ Hàng:" << GREEN
-                               << padLeft(totalLines, 12) << RESET << " ║";
+                               << padLeft(totalLines, 11) << RESET << " ║";
         else if (i == 12) cout << "   ╠══════════════════╣";
         else if (i == 13) cout << "   ║ Combo:           ║";
         else if (i == 14) cout << "   ║  1 hàng =  36đ   ║";
