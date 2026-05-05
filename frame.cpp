@@ -43,6 +43,7 @@ int x = 4, y = 0, b = 1;
 int score = 0;
 int highScore = 0; // Biến lưu kỷ lục
 int totalLines = 0;
+bool paused = false;
 
 // Tính điểm
 int calcScore(int lines) {
@@ -130,6 +131,34 @@ char get_input(void) {
 #endif
 }
 
+// Xử lý phím mũi tên
+char getArrowKey(void) {
+#ifdef _WIN32
+    char c = _getch();
+    if (c == 0 || c == 224) {
+        char c2 = _getch();
+        if (c2 == 75) return 'L';  // Trái
+        if (c2 == 77) return 'R';  // Phải
+        if (c2 == 72) return 'U';  // Lên
+        if (c2 == 80) return 'D';  // Xuống
+    }
+    return c;
+#else
+    char ch = getchar();
+    if (ch == 27) {  // ESC
+        char c2 = getchar();
+        if (c2 == '[') {
+            char c3 = getchar();
+            if (c3 == 'A') return 'U';  // Lên
+            if (c3 == 'B') return 'D';  // Xuống
+            if (c3 == 'C') return 'R';  // Phải
+            if (c3 == 'D') return 'L';  // Trái
+        }
+    }
+    return ch;
+#endif
+}
+
 void sleep_ms(int ms) {
 #ifdef _WIN32
     Sleep(ms);
@@ -192,25 +221,31 @@ void draw() {
         // Panel bên phải 
         if      (i == 0)  cout << "   ║  BẢNG ĐIỀU KHIỂN ║";
         else if (i == 1)  cout << "   ╠══════════════════╣";
-        else if (i == 2)  cout << "   ║ [A] : Sang trái  ║";
-        else if (i == 3)  cout << "   ║ [D] : Sang phải  ║";
-        else if (i == 4)  cout << "   ║ [W] : Xoay khối  ║";
-        else if (i == 5)  cout << "   ║ [X] : Rơi nhanh  ║";
-        else if (i == 6)  cout << "   ║ [Q] : Thoát game ║";
-        else if (i == 7)  cout << "   ╠══════════════════╣";
-        // --- Bảng điểm ---
-        else if (i == 8)  cout << "   ║    BẢNG ĐIỂM     ║";
-        else if (i == 9)  cout << "   ╠══════════════════╣";
-        else if (i == 10) cout << "   ║ K.Lục:" << RED    << padLeft(highScore, 11)  << RESET << " ║";
-        else if (i == 11) cout << "   ║ Điểm :" << YELLOW << padLeft(score, 11)      << RESET << " ║";
-        else if (i == 12) cout << "   ║ Hàng :" << GREEN  << padLeft(totalLines, 11) << RESET << " ║";
-        else if (i == 13) cout << "   ╠══════════════════╣";
-        else if (i == 14) cout << "   ║ Combo:           ║";
-        else if (i == 15) cout << "   ║  1 hàng =  36đ   ║";
-        else if (i == 16) cout << "   ║  2 hàng = 108đ   ║";
-        else if (i == 17) cout << "   ║  3 hàng = 324đ   ║";
-        else if (i == 18) cout << "   ║  4 hàng = 972đ   ║";
+        else if (i == 2)  cout << "   ║ [←/→] : Di chuyển ║";
+        else if (i == 3)  cout << "   ║ [↑]   : Xoay      ║";
+        else if (i == 4)  cout << "   ║ [↓]   : Rơi nhanh ║";
+        else if (i == 5)  cout << "   ║ [Space]: Rơi ngay ║";
+        else if (i == 6)  cout << "   ║ [P]   : Tạm dừng  ║";
+        else if (i == 7)  cout << "   ║ [Q]   : Thoát     ║";
+        else if (i == 8)  cout << "   ╠══════════════════╣";
+        else if (i == 9)  cout << "   ║    BẢNG ĐIỂM     ║";
+        else if (i == 10) cout << "   ╠══════════════════╣";
+        else if (i == 11) cout << "   ║ K.Lục:" << RED    << padLeft(highScore, 11)  << RESET << " ║";
+        else if (i == 12) cout << "   ║ Điểm :" << YELLOW << padLeft(score, 11)      << RESET << " ║";
+        else if (i == 13) cout << "   ║ Hàng :" << GREEN  << padLeft(totalLines, 11) << RESET << " ║";
+        else if (i == 14) cout << "   ╠══════════════════╣";
+        else if (i == 15) {
+            cout << "   ║ Trạng thái: ";
+            if (paused) cout << RED << "TẠM DỪNG" << RESET;
+            else cout << "Đang chơi";
+            cout << "  ║";
+        }
+        else if (i == 16) cout << "   ║ Combo:           ║";
+        else if (i == 17) cout << "   ║  1 hàng =  36đ   ║";
+        else if (i == 18) cout << "   ║  2 hàng = 108đ   ║";
         else if (i == 19) cout << "   ╚══════════════════╝";
+        // Dòng cuối được thêm ở cuối vòng lặp
+
         cout << endl;
     }
 }
@@ -276,6 +311,13 @@ void rotateBlock() {
                 currentBlock[i][j] = rotated[i][j];
 }
 
+// Rơi tức thì (Hard Drop)
+void hardDrop() {
+    while (canMove(0, 1)) {
+        y++;
+    }
+}
+
 void spawnBlock() {
     x = 4; 
     y = 0; 
@@ -303,36 +345,50 @@ int main() {
 
         if (check_kbhit()) {
             char c = get_input();
-            if ((c=='a' || c=='A') && canMove(-1,0)) x--;
-            if ((c=='d' || c=='D') && canMove(1,0)) x++;
-            if ((c=='x' || c=='X') && canMove(0,1)) y++;
-            if (c=='w' || c=='W') rotateBlock();
-            if (c=='q' || c=='Q') break;
+            
+            // Xử lý phím thông thường
+            if (c == 27) {  // ESC (phím mũi tên)
+                c = getArrowKey();
+                if (c == 'L' && canMove(-1, 0)) x--;  // Mũi tên trái
+                if (c == 'R' && canMove(1, 0)) x++;   // Mũi tên phải
+                if (c == 'U') rotateBlock();           // Mũi tên lên
+                if (c == 'D' && canMove(0, 1)) y++;   // Mũi tên xuống
+            } else {
+                if ((c == 'a' || c == 'A') && canMove(-1, 0)) x--;
+                if ((c == 'd' || c == 'D') && canMove(1, 0)) x++;
+                if ((c == 'x' || c == 'X') && canMove(0, 1)) y++;
+                if ((c == 'w' || c == 'W')) rotateBlock();
+                if (c == ' ') hardDrop();  // Space: Rơi tức thì
+                if (c == 'p' || c == 'P') paused = !paused;  // P: Tạm dừng
+                if (c == 'q' || c == 'Q') break;
+            }
         }
 
-        moveTimer++;
-        if (moveTimer >= dropLimit) {
-            if (canMove(0,1)) {
-                y++;
-            } else {
-                block2Board();
-                int lines = removeLine();
-                if (lines > 0) {
-                    score += calcScore(lines);
-                    totalLines += lines;
-                    
-                    // Cập nhật kỷ lục ngay lập tức nếu vượt
-                    if (score > highScore) {
-                        highScore = score;
-                    }
+        if (!paused) {
+            moveTimer++;
+            if (moveTimer >= dropLimit) {
+                if (canMove(0, 1)) {
+                    y++;
+                } else {
+                    block2Board();
+                    int lines = removeLine();
+                    if (lines > 0) {
+                        score += calcScore(lines);
+                        totalLines += lines;
+                        
+                        // Cập nhật kỷ lục ngay lập tức nếu vượt
+                        if (score > highScore) {
+                            highScore = score;
+                        }
 
-                    dropLimit -= lines;
-                    if (dropLimit < 1) dropLimit = 1;
+                        dropLimit -= lines;
+                        if (dropLimit < 1) dropLimit = 1;
+                    }
+                    spawnBlock();
+                    if (!canMove(0, 0)) break;
                 }
-                spawnBlock();
-                if (!canMove(0,0)) break;
+                moveTimer = 0;
             }
-            moveTimer = 0;
         }
 
         block2Board();
