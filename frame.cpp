@@ -41,11 +41,10 @@ char currentBlock[4][4];
 
 int x = 4, y = 0, b = 1;
 int score = 0;
-int highScore = 0; // Biến lưu kỷ lục
+int highScore = 0; 
 int totalLines = 0;
 bool paused = false;
 
-// Tính điểm
 int calcScore(int lines) {
     if (lines <= 0) return 0;
     int pts = 36;
@@ -53,7 +52,6 @@ int calcScore(int lines) {
     return pts;
 }
 
-// Đọc kỷ lục từ file
 void loadHighScore() {
     ifstream file("highscore.txt");
     if (file.is_open()) {
@@ -62,7 +60,6 @@ void loadHighScore() {
     }
 }
 
-// Lưu kỷ lục vào file
 void saveHighScore() {
     ofstream file("highscore.txt");
     if (file.is_open()) {
@@ -131,23 +128,22 @@ char get_input(void) {
 #endif
 }
 
-// Xử lý phím mũi tên
 char getArrowKey(void) {
 #ifdef _WIN32
     char c2 = _getch();
-    if (c2 == 75) return 'L';  // Trái
-    if (c2 == 77) return 'R';  // Phải
-    if (c2 == 72) return 'U';  // Lên
-    if (c2 == 80) return 'D';  // Xuống
+    if (c2 == 75) return 'L';
+    if (c2 == 77) return 'R';
+    if (c2 == 72) return 'U';
+    if (c2 == 80) return 'D';
     return c2;
 #else
     char c2 = getchar();
     if (c2 == '[') {
         char c3 = getchar();
-        if (c3 == 'A') return 'U';  // Lên
-        if (c3 == 'B') return 'D';  // Xuống
-        if (c3 == 'C') return 'R';  // Phải
-        if (c3 == 'D') return 'L';  // Trái
+        if (c3 == 'A') return 'U';
+        if (c3 == 'B') return 'D';
+        if (c3 == 'C') return 'R';
+        if (c3 == 'D') return 'L';
     }
     return c2;
 #endif
@@ -190,11 +186,13 @@ void initBoard() {
 
 void draw() {
     gotoxy(0,0);
+    // Vẽ khung trên cùng (Đã chỉnh thành 3 khoảng trắng để thẳng hàng tuyệt đối)
     cout << WHITE << "╔═";
     for (int j = 1; j < W - 1; j++) cout << "══";
-    cout << "═╗   ╔══════════════════╗" << RESET << endl;
+    cout << "═╗   ╔══════════════════════╗" << RESET << endl;
 
     for (int i = 0 ; i < H ; i++){
+        // Vẽ bàn cờ (Trái)
         for (int j = 0 ; j < W ; j++){
             if (board[i][j] == '#') {
                 cout << WHITE;
@@ -212,39 +210,37 @@ void draw() {
             }
         }
 
-        // Panel bên phải 
-        if      (i == 0)  cout << "   ║  BẢNG ĐIỀU KHIỂN ║";
-        else if (i == 1)  cout << "   ╠══════════════════╣";
-        else if (i == 2)  cout << "   ║ [A/←] : Trái     ║";
-        else if (i == 3)  cout << "   ║ [D/→] : Phải     ║";
-        else if (i == 4)  cout << "   ║ [W/↑] : Xoay     ║";
-        else if (i == 5)  cout << "   ║ [X/↓] : Rơi nhanh║";
-        else if (i == 6)  cout << "   ║ [Space]: Rơi ngay║";
-        else if (i == 7)  cout << "   ║ [P] : Tạm dừng   ║";
-        else if (i == 8)  cout << "   ║ [Q] : Thoát      ║";
-        else if (i == 9)  cout << "   ╠══════════════════╣";
-        else if (i == 10) cout << "   ║   BẢNG ĐIỂM      ║";
-        else if (i == 11) cout << "   ╠══════════════════╣";
-        else if (i == 12) cout << "   ║ K.Lục:" << RED    << padLeft(highScore, 10)  << RESET << " ║";
-        else if (i == 13) cout << "   ║ Điểm :" << YELLOW << padLeft(score, 10)      << RESET << " ║";
-        else if (i == 14) cout << "   ║ Hàng :" << GREEN  << padLeft(totalLines, 10) << RESET << " ║";
-        else if (i == 15) cout << "   ╠══════════════════╣";
-        else if (i == 16) {
-            cout << "   ║ TT:";
-            if (paused) {
-                cout << RED << "  TẠM DỪNG " << RESET << "║";
-            } else {
-                cout << " Đang chơi   ║";
-            }
+        // Vẽ Panel (Phải) - Dùng đúng 3 khoảng trắng để khớp với dòng trên
+        cout << "   "; 
+        switch(i) {
+            case 0:  cout << "║   BẢNG ĐIỀU KHIỂN    ║"; break;
+            case 1:  cout << "╠══════════════════════╣"; break;
+            case 2:  cout << "║ [A/←]   : Trái       ║"; break;
+            case 3:  cout << "║ [D/→]   : Phải       ║"; break;
+            case 4:  cout << "║ [W/↑]   : Xoay       ║"; break;
+            case 5:  cout << "║ [X/↓]   : Rơi nhanh  ║"; break;
+            case 6:  cout << "║ [Space] : Rơi ngay   ║"; break;
+            case 7:  cout << "║ [P]     : Tạm dừng   ║"; break;
+            case 8:  cout << "║ [Q]     : Thoát      ║"; break;
+            case 9:  cout << "╠══════════════════════╣"; break;
+            case 10: cout << "║      BẢNG ĐIỂM       ║"; break;
+            case 11: cout << "╠══════════════════════╣"; break;
+            case 12: cout << "║ K.Lục: " << RED    << padLeft(highScore, 13) << RESET << " ║"; break;
+            case 13: cout << "║ Điểm : " << YELLOW << padLeft(score, 13)     << RESET << " ║"; break;
+            case 14: cout << "║ Hàng : " << GREEN  << padLeft(totalLines, 13) << RESET << " ║"; break;
+            case 15: cout << "╠══════════════════════╣"; break;
+            case 16: 
+                if (paused) cout << "║ TT: " << RED << "   TẠM DỪNG    " << RESET << " ║";
+                else        cout << "║ TT: Đang chơi        ║"; 
+                break;
+            case 17: cout << "║ Combo:               ║"; break;
+            case 18: cout << "║ 1 hàng =  36đ        ║"; break;
+            case 19: cout << "╚══════════════════════╝"; break;
+            default: cout << "                        "; break;
         }
-        else if (i == 17) cout << "   ║ Combo:           ║";
-        else if (i == 18) cout << "   ║ 1 hàng =  36đ    ║";
-        else if (i == 19) cout << "   ╚══════════════════╝";
-
         cout << endl;
     }
 }
-
 bool canMove(int dx, int dy) {
     for (int i = 0 ; i < 4 ; i++)
         for (int j = 0 ; j < 4 ; j++)
@@ -306,7 +302,6 @@ void rotateBlock() {
                 currentBlock[i][j] = rotated[i][j];
 }
 
-// Rơi tức thì (Hard Drop)
 void hardDrop() {
     while (canMove(0, 1)) {
         y++;
@@ -325,10 +320,13 @@ void spawnBlock() {
 }
 
 int main() {
+    // Đối với Windows, cần thiết lập mã UTF-8 để hiển thị các ký tự khung
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+#endif
+
     srand(time(0));
-    
-    loadHighScore(); // Tải kỷ lục khi mở game
-    
+    loadHighScore(); 
     initBoard();
     spawnBlock();
 
@@ -340,23 +338,20 @@ int main() {
 
         if (check_kbhit()) {
             char c = get_input();
-            
-            // Xử lý phím mũi tên
-            if (c == 27) {  // ESC
+            if (c == 27) {  
                 c = getArrowKey();
-                if (c == 'L' && canMove(-1, 0)) x--;  // Mũi tên trái
-                if (c == 'R' && canMove(1, 0)) x++;   // Mũi tên phải
-                if (c == 'U') rotateBlock();           // Mũi tên lên
-                if (c == 'D' && canMove(0, 1)) y++;   // Mũi tên xuống
+                if (c == 'L' && canMove(-1, 0)) x--;
+                if (c == 'R' && canMove(1, 0)) x++;
+                if (c == 'U') rotateBlock();
+                if (c == 'D' && canMove(0, 1)) y++;
             } 
             else {
-                // Xử lý các phím khác
                 if ((c == 'a' || c == 'A') && canMove(-1, 0)) x--;
                 if ((c == 'd' || c == 'D') && canMove(1, 0)) x++;
                 if ((c == 'x' || c == 'X') && canMove(0, 1)) y++;
                 if ((c == 'w' || c == 'W')) rotateBlock();
-                if (c == ' ') hardDrop();  // Space: Rơi tức thì
-                if (c == 'p' || c == 'P') paused = !paused;  // P: Tạm dừng
+                if (c == ' ') hardDrop();
+                if (c == 'p' || c == 'P') paused = !paused;
                 if (c == 'q' || c == 'Q') break;
             }
         }
@@ -372,12 +367,7 @@ int main() {
                     if (lines > 0) {
                         score += calcScore(lines);
                         totalLines += lines;
-                        
-                        // Cập nhật kỷ lục ngay lập tức nếu vượt
-                        if (score > highScore) {
-                            highScore = score;
-                        }
-
+                        if (score > highScore) highScore = score;
                         dropLimit -= lines;
                         if (dropLimit < 1) dropLimit = 1;
                     }
@@ -393,8 +383,7 @@ int main() {
         sleep_ms(30);
     }
     
-    saveHighScore(); // Lưu lại kỷ lục khi kết thúc game
-
+    saveHighScore(); 
 
     gotoxy(0, H + 2);
     cout << WHITE << "╔══════════════════════════════╗" << endl;
