@@ -29,7 +29,7 @@ Chào mừng bạn đến với dự án **Tetris**! Đây là phiên bản tái
 3. **Biên dịch và thực thi:**
    ```bash
    # Ví dụ nếu dùng g++
-   g++ main.cpp -o tetris
+   g++ frame.cpp -o tetris
    ./tetris
    ```
 
