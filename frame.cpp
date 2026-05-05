@@ -134,28 +134,22 @@ char get_input(void) {
 // Xử lý phím mũi tên
 char getArrowKey(void) {
 #ifdef _WIN32
-    char c = _getch();
-    if (c == 0 || c == 224) {
-        char c2 = _getch();
-        if (c2 == 75) return 'L';  // Trái
-        if (c2 == 77) return 'R';  // Phải
-        if (c2 == 72) return 'U';  // Lên
-        if (c2 == 80) return 'D';  // Xuống
-    }
-    return c;
+    char c2 = _getch();
+    if (c2 == 75) return 'L';  // Trái
+    if (c2 == 77) return 'R';  // Phải
+    if (c2 == 72) return 'U';  // Lên
+    if (c2 == 80) return 'D';  // Xuống
+    return c2;
 #else
-    char ch = getchar();
-    if (ch == 27) {  // ESC
-        char c2 = getchar();
-        if (c2 == '[') {
-            char c3 = getchar();
-            if (c3 == 'A') return 'U';  // Lên
-            if (c3 == 'B') return 'D';  // Xuống
-            if (c3 == 'C') return 'R';  // Phải
-            if (c3 == 'D') return 'L';  // Trái
-        }
+    char c2 = getchar();
+    if (c2 == '[') {
+        char c3 = getchar();
+        if (c3 == 'A') return 'U';  // Lên
+        if (c3 == 'B') return 'D';  // Xuống
+        if (c3 == 'C') return 'R';  // Phải
+        if (c3 == 'D') return 'L';  // Trái
     }
-    return ch;
+    return c2;
 #endif
 }
 
@@ -221,30 +215,31 @@ void draw() {
         // Panel bên phải 
         if      (i == 0)  cout << "   ║  BẢNG ĐIỀU KHIỂN ║";
         else if (i == 1)  cout << "   ╠══════════════════╣";
-        else if (i == 2)  cout << "   ║ [←/→] : Di chuyển ║";
-        else if (i == 3)  cout << "   ║ [↑]   : Xoay      ║";
-        else if (i == 4)  cout << "   ║ [↓]   : Rơi nhanh ║";
-        else if (i == 5)  cout << "   ║ [Space]: Rơi ngay ║";
-        else if (i == 6)  cout << "   ║ [P]   : Tạm dừng  ║";
-        else if (i == 7)  cout << "   ║ [Q]   : Thoát     ║";
-        else if (i == 8)  cout << "   ╠══════════════════╣";
-        else if (i == 9)  cout << "   ║    BẢNG ĐIỂM     ║";
-        else if (i == 10) cout << "   ╠══════════════════╣";
-        else if (i == 11) cout << "   ║ K.Lục:" << RED    << padLeft(highScore, 11)  << RESET << " ║";
-        else if (i == 12) cout << "   ║ Điểm :" << YELLOW << padLeft(score, 11)      << RESET << " ║";
-        else if (i == 13) cout << "   ║ Hàng :" << GREEN  << padLeft(totalLines, 11) << RESET << " ║";
-        else if (i == 14) cout << "   ╠══════════════════╣";
-        else if (i == 15) {
-            cout << "   ║ Trạng thái: ";
-            if (paused) cout << RED << "TẠM DỪNG" << RESET;
-            else cout << "Đang chơi";
-            cout << "  ║";
+        else if (i == 2)  cout << "   ║ [A/←] : Trái     ║";
+        else if (i == 3)  cout << "   ║ [D/→] : Phải     ║";
+        else if (i == 4)  cout << "   ║ [W/↑] : Xoay     ║";
+        else if (i == 5)  cout << "   ║ [X/↓] : Rơi nhanh║";
+        else if (i == 6)  cout << "   ║ [Space]: Rơi ngay║";
+        else if (i == 7)  cout << "   ║ [P] : Tạm dừng   ║";
+        else if (i == 8)  cout << "   ║ [Q] : Thoát      ║";
+        else if (i == 9)  cout << "   ╠══════════════════╣";
+        else if (i == 10) cout << "   ║   BẢNG ĐIỂM      ║";
+        else if (i == 11) cout << "   ╠══════════════════╣";
+        else if (i == 12) cout << "   ║ K.Lục:" << RED    << padLeft(highScore, 10)  << RESET << " ║";
+        else if (i == 13) cout << "   ║ Điểm :" << YELLOW << padLeft(score, 10)      << RESET << " ║";
+        else if (i == 14) cout << "   ║ Hàng :" << GREEN  << padLeft(totalLines, 10) << RESET << " ║";
+        else if (i == 15) cout << "   ╠══════════════════╣";
+        else if (i == 16) {
+            cout << "   ║ TT:";
+            if (paused) {
+                cout << RED << "  TẠM DỪNG " << RESET << "║";
+            } else {
+                cout << " Đang chơi   ║";
+            }
         }
-        else if (i == 16) cout << "   ║ Combo:           ║";
-        else if (i == 17) cout << "   ║  1 hàng =  36đ   ║";
-        else if (i == 18) cout << "   ║  2 hàng = 108đ   ║";
+        else if (i == 17) cout << "   ║ Combo:           ║";
+        else if (i == 18) cout << "   ║ 1 hàng =  36đ    ║";
         else if (i == 19) cout << "   ╚══════════════════╝";
-        // Dòng cuối được thêm ở cuối vòng lặp
 
         cout << endl;
     }
@@ -346,14 +341,16 @@ int main() {
         if (check_kbhit()) {
             char c = get_input();
             
-            // Xử lý phím thông thường
-            if (c == 27) {  // ESC (phím mũi tên)
+            // Xử lý phím mũi tên
+            if (c == 27) {  // ESC
                 c = getArrowKey();
                 if (c == 'L' && canMove(-1, 0)) x--;  // Mũi tên trái
                 if (c == 'R' && canMove(1, 0)) x++;   // Mũi tên phải
                 if (c == 'U') rotateBlock();           // Mũi tên lên
                 if (c == 'D' && canMove(0, 1)) y++;   // Mũi tên xuống
-            } else {
+            } 
+            else {
+                // Xử lý các phím khác
                 if ((c == 'a' || c == 'A') && canMove(-1, 0)) x--;
                 if ((c == 'd' || c == 'D') && canMove(1, 0)) x++;
                 if ((c == 'x' || c == 'X') && canMove(0, 1)) y++;
