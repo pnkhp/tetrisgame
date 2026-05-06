@@ -226,7 +226,7 @@ class Tetris:
         self.total_lines += len(rows)
         if self.score > self.high_score:
             self.high_score = self.score
-        # Build combo text
+            
         names = {1: '1 HÀNG  +36đ', 2: '2 HÀNG  +108đ',
                  3: '3 HÀNG  +324đ', 4: '4 HÀNG  +972đ'}
         self.combo_text = names.get(len(rows), f'{len(rows)} HÀNG!')
@@ -234,9 +234,12 @@ class Tetris:
 
         for r in sorted(rows, reverse=True):
             del self.board[r]
-            self.board.insert(0, [' '] * (BOARD_COLS + 2))
-            self.board[0][0] = '#'
-            self.board[0][BOARD_COLS + 1] = '#'
+            
+        for _ in range(len(rows)):
+            new_row = [' '] * (BOARD_COLS + 2)
+            new_row[0] = '#'
+            new_row[-1] = '#'
+            self.board.insert(0, new_row)
 
         self.drop_limit -= len(rows)
         if self.drop_limit < DROP_MIN:
