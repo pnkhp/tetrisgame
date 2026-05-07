@@ -128,7 +128,14 @@ class Tetris:
         self.cx = 4
         self.cy = 0
         self.piece = None
+        self.bag = []
         self._spawn()
+
+    def _get_next_block(self):
+        if len(self.bag) == 0:
+            self.bag = list(SHAPE_KEYS) 
+            random.shuffle(self.bag)  
+        return self.bag.pop()
 
     def _empty_board(self):
         # Board cells: ' ' empty, '#' wall, letter = locked piece
@@ -144,7 +151,7 @@ class Tetris:
         return board
 
     def _spawn(self):
-        key = random.choice(SHAPE_KEYS)
+        key = self._get_next_block()
         self.piece = [row[:] for row in SHAPES[key]]
         self.cx = 4
         self.cy = 0
