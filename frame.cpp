@@ -38,8 +38,10 @@ char blocks[][4][4] = {
         {{' ',' ',' ',' '}, {' ',' ','L',' '}, {'L','L','L',' '}, {' ',' ',' ',' '}}
 };
 char currentBlock[4][4];
+char nextBlock[4][4];
 
 int x = 4, y = 0, b = 1;
+int nextBlockType = 1;
 int score = 0;
 int highScore = 0; 
 int totalLines = 0;
@@ -186,10 +188,10 @@ void initBoard() {
 
 void draw() {
     gotoxy(0,0);
-    // Vẽ khung trên cùng (Đã chỉnh thành 3 khoảng trắng để thẳng hàng tuyệt đối)
+    // Vẽ khung trên cùng
     cout << WHITE << "╔═";
     for (int j = 1; j < W - 1; j++) cout << "══";
-    cout << "═╗   ╔══════════════════════╗" << RESET << endl;
+    cout << "═╗   ╔══════════════════════╗   ╔════════════╗" << RESET << endl;
 
     for (int i = 0 ; i < H ; i++){
         // Vẽ bàn cờ (Trái)
@@ -210,7 +212,7 @@ void draw() {
             }
         }
 
-        // Vẽ Panel (Phải) - Dùng đúng 3 khoảng trắng để khớp với dòng trên
+        // Vẽ Bảng Điều Khiển (Giữa)
         cout << "   "; 
         switch(i) {
             case 0:  cout << "║   BẢNG ĐIỀU KHIỂN    ║"; break;
@@ -237,6 +239,71 @@ void draw() {
             case 18: cout << "║ 1 hàng =  36đ        ║"; break;
             case 19: cout << "╚══════════════════════╝"; break;
             default: cout << "                        "; break;
+        }
+
+        // Vẽ Khung Block Tiếp Theo (Phải)
+        cout << "   ";
+        switch(i) {
+            case 0:  cout << "╔══════════╗"; break;
+            case 1:  cout << "║  BLOCK   ║"; break;
+            case 2:  {
+                cout << "║ ";
+                for (int j = 0; j < 4; j++) {
+                    if (nextBlock[0][j] != ' ') {
+                        applyColor(nextBlock[0][j]);
+                        cout << "[]";
+                        cout << RESET;
+                    } else {
+                        cout << "  ";
+                    }
+                }
+                cout << " ║";
+                break;
+            }
+            case 3:  {
+                cout << "║ ";
+                for (int j = 0; j < 4; j++) {
+                    if (nextBlock[1][j] != ' ') {
+                        applyColor(nextBlock[1][j]);
+                        cout << "[]";
+                        cout << RESET;
+                    } else {
+                        cout << "  ";
+                    }
+                }
+                cout << " ║";
+                break;
+            }
+            case 4:  {
+                cout << "║ ";
+                for (int j = 0; j < 4; j++) {
+                    if (nextBlock[2][j] != ' ') {
+                        applyColor(nextBlock[2][j]);
+                        cout << "[]";
+                        cout << RESET;
+                    } else {
+                        cout << "  ";
+                    }
+                }
+                cout << " ║";
+                break;
+            }
+            case 5:  {
+                cout << "║ ";
+                for (int j = 0; j < 4; j++) {
+                    if (nextBlock[3][j] != ' ') {
+                        applyColor(nextBlock[3][j]);
+                        cout << "[]";
+                        cout << RESET;
+                    } else {
+                        cout << "  ";
+                    }
+                }
+                cout << " ║";
+                break;
+            }
+            case 6:  cout << "╚══════════╝"; break;
+            default: cout << "            "; break;
         }
         cout << endl;
     }
@@ -309,10 +376,9 @@ void hardDrop() {
 }
 
 int bag[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-int bagIndex = 8; 
+int bagIndex = 8;
 
-void spawnBlock() {
-    x = 4; y = 0;
+void updateNextBlock() {
     if (bagIndex >= 8) {
         for(int i=0; i<8; i++) bag[i] = i;
         for (int i = 7; i > 0; i--) {
@@ -321,14 +387,27 @@ void spawnBlock() {
         }
         bagIndex = 0;
     }
-
-    b = bag[bagIndex++];
     
+    nextBlockType = bag[bagIndex];
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            nextBlock[i][j] = blocks[nextBlockType][i][j];
+        }
+    }
+}
+
+void spawnBlock() {
+    x = 4; y = 0;
+    
+    b = nextBlockType;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             currentBlock[i][j] = blocks[b][i][j];
         }
     }
+    
+    bagIndex++;
+    updateNextBlock();
 }
 int main() {
     // Đối với Windows, cần thiết lập mã UTF-8 để hiển thị các ký tự khung
@@ -339,6 +418,7 @@ int main() {
     srand(time(0));
     loadHighScore(); 
     initBoard();
+    updateNextBlock();
     spawnBlock();
 
     int moveTimer = 0;
