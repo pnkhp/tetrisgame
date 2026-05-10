@@ -191,7 +191,7 @@ void draw() {
     // Vẽ khung trên cùng
     cout << WHITE << "╔═";
     for (int j = 1; j < W - 1; j++) cout << "══";
-    cout << "═╗   ╔══════════════════════╗   ╔════════════╗" << RESET << endl;
+    cout << "═╗   ╔══════════════════════╗   ╔══════════╗" << RESET << endl;
 
     for (int i = 0 ; i < H ; i++){
         // Vẽ bàn cờ (Trái)
@@ -244,8 +244,8 @@ void draw() {
         // Vẽ Khung Block Tiếp Theo (Phải)
         cout << "   ";
         switch(i) {
-            case 0:  cout << "╔══════════╗"; break;
-            case 1:  cout << "║  BLOCK   ║"; break;
+            case 0:  cout << "║  BLOCK   ║"; break;
+            case 1:  cout << "║          ║"; break;
             case 2:  {
                 cout << "║ ";
                 for (int j = 0; j < 4; j++) {
