@@ -1,3 +1,4 @@
+# pyrefly: ignore [missing-import]
 import pygame
 import random
 import sys
@@ -129,6 +130,7 @@ class Tetris:
         self.cy = 0
         self.piece = None
         self.bag = []
+        self.next_piece_key = self._get_next_block()
         self._spawn()
 
     def _get_next_block(self):
@@ -151,7 +153,8 @@ class Tetris:
         return board
 
     def _spawn(self):
-        key = self._get_next_block()
+        key = getattr(self, 'next_piece_key', self._get_next_block())
+        self.next_piece_key = self._get_next_block()
         self.piece = [row[:] for row in SHAPES[key]]
         self.cx = 4
         self.cy = 0
@@ -424,6 +427,41 @@ class Renderer:
             s.set_alpha(alpha)
             self.screen.blit(s, (px + (PANEL_W - s.get_width()) // 2, y))
         y += 28
+
+        pygame.draw.line(self.screen, WALL_C, (px + pad, y), (px + PANEL_W - pad, y))
+        y += 12
+
+        # Next Block
+        nb_lbl = self.font_md.render('KHỐI TIẾP THEO', True, ACCENT)
+        self.screen.blit(nb_lbl, (px + (PANEL_W - nb_lbl.get_width()) // 2, y))
+        y += nb_lbl.get_height() + 8
+
+        if hasattr(game, 'next_piece_key') and game.next_piece_key:
+            shape = SHAPES[game.next_piece_key]
+            min_r, max_r, min_c, max_c = 4, -1, 4, -1
+            for r in range(4):
+                for c in range(4):
+                    if shape[r][c] != ' ':
+                        min_r = min(min_r, r)
+                        max_r = max(max_r, r)
+                        min_c = min(min_c, c)
+                        max_c = max(max_c, c)
+            
+            w = (max_c - min_c + 1) * CELL
+            h = (max_r - min_r + 1) * CELL
+            start_x = px + (PANEL_W - w) // 2
+            start_y = y
+            
+            for r in range(min_r, max_r + 1):
+                for c in range(min_c, max_c + 1):
+                    ch = shape[r][c]
+                    if ch != ' ':
+                        rect = pygame.Rect(start_x + (c - min_c) * CELL, start_y + (r - min_r) * CELL, CELL, CELL)
+                        ct, cb = BLOCK_COLORS.get(ch, ((150,150,150),(100,100,100)))
+                        self._draw_block(self.screen, rect, ct, cb)
+            y += h + 12
+        else:
+            y += CELL * 2 + 12
 
         pygame.draw.line(self.screen, WALL_C, (px + pad, y), (px + PANEL_W - pad, y))
         y += 14
