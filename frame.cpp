@@ -25,6 +25,7 @@ using namespace std;
 #define RED     "\033[31m"
 #define BLUE    "\033[34m"
 #define WHITE   "\033[37m"
+#define GHOST   "\033[2;90m"
 
 char board[H][W] = {};
 char blocks[][4][4] = {
@@ -40,6 +41,7 @@ char blocks[][4][4] = {
 char currentBlock[4][4];
 
 int x = 4, y = 0, b = 1;
+int ghostY = 0;
 int score = 0;
 int highScore = 0; 
 int totalLines = 0;
@@ -177,6 +179,32 @@ void block2Board() {
                 board[y+i][x+j] = currentBlock[i][j];
 }
 
+bool canPlaceAt(int testX, int testY) {
+    for (int i = 0 ; i < 4 ; i++)
+        for (int j = 0 ; j < 4 ; j++)
+            if (currentBlock[i][j] != ' ') {
+                int tx = testX + j;
+                int ty = testY + i;
+                if (tx < 1 || tx >= W - 1 || ty >= H - 1) return false;
+                if (board[ty][tx] != ' ') return false;
+            }
+    return true;
+}
+
+int getGhostY() {
+    int testY = y;
+    while (canPlaceAt(x, testY + 1)) testY++;
+    return testY;
+}
+
+bool isGhostCell(int row, int col) {
+    for (int i = 0 ; i < 4 ; i++)
+        for (int j = 0 ; j < 4 ; j++)
+            if (currentBlock[i][j] != ' ' && x + j == col && ghostY + i == row && board[row][col] == ' ')
+                return true;
+    return false;
+}
+
 void initBoard() {
     for (int i = 0 ; i < H ; i++)
         for (int j = 0 ; j < W ; j++)
@@ -202,11 +230,17 @@ void draw() {
                 else if (j == 0) cout << "║ ";
                 else if (j == W - 1) cout << " ║";
                 cout << RESET;
-            } else if (board[i][j] == ' ') {
-                cout << "  ";
             } else {
-                applyColor(board[i][j]);
-                cout << "[]" << RESET;
+                if (board[i][j] == ' ') {
+                    if (isGhostCell(i, j)) {
+                        cout << GHOST << "[]" << RESET;
+                    } else {
+                        cout << "  ";
+                    }
+                } else {
+                    applyColor(board[i][j]);
+                    cout << "[]" << RESET;
+                }
             }
         }
 
@@ -386,6 +420,7 @@ int main() {
             }
         }
 
+        ghostY = getGhostY();
         block2Board();
         draw();
         sleep_ms(30);
