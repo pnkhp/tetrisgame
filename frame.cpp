@@ -338,16 +338,24 @@ int main() {
 
         if (check_kbhit()) {
             char c = get_input();
-            if (c == 27) {  
-                c = getArrowKey();
-                if (c == 'L' && canMove(-1, 0)) x--;
-                if (c == 'R' && canMove(1, 0)) x++;
-                if (c == 'U') rotateBlock();
-                if (c == 'D' && canMove(0, 1)) y++;
-            } 
+            unsigned char uc = (unsigned char)c;
+            if (uc == 27) {  // Unix-like: ESC sequence
+                char ar = getArrowKey();
+                if (ar == 'L' && canMove(-1, 0)) x--;
+                if (ar == 'R' && canMove(1, 0)) x++;
+                if (ar == 'U') rotateBlock();
+                if (ar == 'D' && canMove(0, 1)) y++;
+            } else if (uc == 0 || uc == 224) { // Windows: special prefix for arrows
+                char ar = getArrowKey();
+                if (ar == 'L' && canMove(-1, 0)) x--;
+                if (ar == 'R' && canMove(1, 0)) x++;
+                if (ar == 'U') rotateBlock();
+                if (ar == 'D' && canMove(0, 1)) y++;
+            }
             else {
                 if ((c == 'a' || c == 'A') && canMove(-1, 0)) x--;
                 if ((c == 'd' || c == 'D') && canMove(1, 0)) x++;
+                if ((c == 's' || c == 'S') && canMove(0, 1)) y++; // S => soft drop
                 if ((c == 'x' || c == 'X') && canMove(0, 1)) y++;
                 if ((c == 'w' || c == 'W')) rotateBlock();
                 if (c == ' ') hardDrop();
