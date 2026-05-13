@@ -14,8 +14,12 @@
 #endif
 
 using namespace std;
-#define H 20
-#define W 15
+
+// Chuẩn Tetris quốc tế: 10 rộng x 20 cao
+// W = 10 ô + 2 ô viền = 12
+// H = 20 ô + 1 ô viền dưới = 21
+#define H 21
+#define W 12
 
 #define RESET   "\033[0m"
 #define CYAN    "\033[36m"
@@ -42,6 +46,7 @@ char currentBlock[4][4];
 
 int x = 4, y = 0, b = 1;
 int ghostY = 0;
+int nextBlockType = 1;
 int score = 0;
 int highScore = 0; 
 int totalLines = 0;
@@ -214,7 +219,7 @@ void initBoard() {
 
 void draw() {
     gotoxy(0,0);
-    // Vẽ khung trên cùng (Đã chỉnh thành 3 khoảng trắng để thẳng hàng tuyệt đối)
+    // Vẽ khung trên cùng của bàn cờ và bảng điều khiển
     cout << WHITE << "╔═";
     for (int j = 1; j < W - 1; j++) cout << "══";
     cout << "═╗   ╔══════════════════════╗" << RESET << endl;
@@ -244,37 +249,58 @@ void draw() {
             }
         }
 
-        // Vẽ Panel (Phải) - Dùng đúng 3 khoảng trắng để khớp với dòng trên
+        // Vẽ Panel bên phải (Độ rộng 24 ký tự)
         cout << "   "; 
         switch(i) {
             case 0:  cout << "║   BẢNG ĐIỀU KHIỂN    ║"; break;
             case 1:  cout << "╠══════════════════════╣"; break;
-            case 2:  cout << "║ [A/←]   : Trái       ║"; break;
-            case 3:  cout << "║ [D/→]   : Phải       ║"; break;
-            case 4:  cout << "║ [W/↑]   : Xoay       ║"; break;
-            case 5:  cout << "║ [X/↓]   : Rơi nhanh  ║"; break;
-            case 6:  cout << "║ [Space] : Rơi ngay   ║"; break;
-            case 7:  cout << "║ [P]     : Tạm dừng   ║"; break;
-            case 8:  cout << "║ [Q]     : Thoát      ║"; break;
-            case 9:  cout << "╠══════════════════════╣"; break;
-            case 10: cout << "║      BẢNG ĐIỂM       ║"; break;
-            case 11: cout << "╠══════════════════════╣"; break;
-            case 12: cout << "║ K.Lục: " << RED    << padLeft(highScore, 13) << RESET << " ║"; break;
-            case 13: cout << "║ Điểm : " << YELLOW << padLeft(score, 13)     << RESET << " ║"; break;
-            case 14: cout << "║ Hàng : " << GREEN  << padLeft(totalLines, 13) << RESET << " ║"; break;
-            case 15: cout << "╠══════════════════════╣"; break;
-            case 16: 
-                if (paused) cout << "║ TT: " << RED << "   TẠM DỪNG    " << RESET << " ║";
-                else        cout << "║ TT: Đang chơi        ║"; 
+            case 2:  cout << "║ Next:                ║"; break;
+            case 3:
+            case 4:
+            case 5:
+            case 6: {
+                int r = i - 3;
+                cout << "║ ";
+                for (int c = 0; c < 4; c++) {
+                    char ch = blocks[nextBlockType][r][c];
+                    if (ch == ' ') cout << "  ";
+                    else {
+                        switch(ch) {
+                            case 'I': cout << CYAN; break;
+                            case 'O': cout << YELLOW; break;
+                            case 'T': cout << MAGENTA; break;
+                            case 'S': cout << GREEN; break;
+                            case 'Z': cout << RED; break;
+                            case 'J': cout << BLUE; break;
+                            case 'L': cout << WHITE; break;
+                            default: cout << RESET; break;
+                        }
+                        cout << "[]" << RESET;
+                    }
+                }
+                cout << "             ║"; // 13 khoảng trắng
                 break;
-            case 17: cout << "║ Combo:               ║"; break;
-            case 18: cout << "║ 1 hàng =  36đ        ║"; break;
-            case 19: cout << "╚══════════════════════╝"; break;
+            }
+            case 7:  cout << "║ [A/←]   : Trái       ║"; break;
+            case 8:  cout << "║ [D/→]   : Phải       ║"; break;
+            case 9:  cout << "║ [W/↑]   : Xoay       ║"; break;
+            case 10: cout << "║ [X/↓]   : Rơi nhanh  ║"; break;
+            case 11: cout << "║ [Space] : Rơi ngay   ║"; break;
+            case 12: cout << "║ [P]     : Tạm dừng   ║"; break;
+            case 13: cout << "║ [Q]     : Thoát      ║"; break;
+            case 14: cout << "╠══════════════════════╣"; break;
+            case 15: cout << "║      BẢNG ĐIỂM       ║"; break;
+            case 16: cout << "╠══════════════════════╣"; break;
+            case 17: cout << "║ K.Lục: " << RED    << padLeft(highScore, 13) << RESET << " ║"; break;
+            case 18: cout << "║ Điểm : " << YELLOW << padLeft(score, 13)     << RESET << " ║"; break;
+            case 19: cout << "║ Hàng : " << GREEN  << padLeft(totalLines, 13) << RESET << " ║"; break;
+            case 20: cout << "╚══════════════════════╝"; break;
             default: cout << "                        "; break;
         }
         cout << endl;
     }
 }
+
 bool canMove(int dx, int dy) {
     for (int i = 0 ; i < 4 ; i++)
         for (int j = 0 ; j < 4 ; j++)
@@ -343,20 +369,21 @@ void hardDrop() {
 }
 
 void spawnBlock() {
-    x = 4; 
+    x = 4; // Căn giữa cho board rộng 10 ô
     y = 0; 
-    b = rand() % 8;
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
+    b = nextBlockType;
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
             currentBlock[i][j] = blocks[b][i][j];
-        }
-    }
+    nextBlockType = rand() % 8;
 }
 
 int main() {
-    // Đối với Windows, cần thiết lập mã UTF-8 để hiển thị các ký tự khung
 #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8);
+    system("cls"); // Xóa màn hình ngay khi vào game mới trên Windows
+#else
+    cout << "\033[2J\033[1;1H"; // ANSI clear screen cho Linux/macOS
 #endif
 
     srand(time(0));
@@ -373,13 +400,13 @@ int main() {
         if (check_kbhit()) {
             char c = get_input();
             unsigned char uc = (unsigned char)c;
-            if (uc == 27) {  // Unix-like: ESC sequence
+            if (uc == 27) {
                 char ar = getArrowKey();
                 if (ar == 'L' && canMove(-1, 0)) x--;
                 if (ar == 'R' && canMove(1, 0)) x++;
                 if (ar == 'U') rotateBlock();
                 if (ar == 'D' && canMove(0, 1)) y++;
-            } else if (uc == 0 || uc == 224) { // Windows: special prefix for arrows
+            } else if (uc == 0 || uc == 224) {
                 char ar = getArrowKey();
                 if (ar == 'L' && canMove(-1, 0)) x--;
                 if (ar == 'R' && canMove(1, 0)) x++;
@@ -389,7 +416,7 @@ int main() {
             else {
                 if ((c == 'a' || c == 'A') && canMove(-1, 0)) x--;
                 if ((c == 'd' || c == 'D') && canMove(1, 0)) x++;
-                if ((c == 's' || c == 'S') && canMove(0, 1)) y++; // S => soft drop
+                if ((c == 's' || c == 'S') && canMove(0, 1)) y++; 
                 if ((c == 'x' || c == 'X') && canMove(0, 1)) y++;
                 if ((c == 'w' || c == 'W')) rotateBlock();
                 if (c == ' ') hardDrop();
