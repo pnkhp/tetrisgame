@@ -16,8 +16,6 @@
 using namespace std;
 
 // Chuẩn Tetris quốc tế: 10 rộng x 20 cao
-// W = 10 ô + 2 ô viền = 12
-// H = 20 ô + 1 ô viền dưới = 21
 #define H 21
 #define W 12
 
@@ -44,7 +42,7 @@ char blocks[][4][4] = {
 };
 char currentBlock[4][4];
 
-int x = 4, y = 0, b = 1;
+int x, y, b;
 int ghostY = 0;
 int nextBlockType = 1;
 int score = 0;
@@ -219,13 +217,11 @@ void initBoard() {
 
 void draw() {
     gotoxy(0,0);
-    // Vẽ khung trên cùng của bàn cờ và bảng điều khiển
     cout << WHITE << "╔═";
     for (int j = 1; j < W - 1; j++) cout << "══";
     cout << "═╗   ╔══════════════════════╗" << RESET << endl;
 
     for (int i = 0 ; i < H ; i++){
-        // Vẽ bàn cờ (Trái)
         for (int j = 0 ; j < W ; j++){
             if (board[i][j] == '#') {
                 cout << WHITE;
@@ -248,8 +244,6 @@ void draw() {
                 }
             }
         }
-
-        // Vẽ Panel bên phải (Độ rộng 24 ký tự)
         cout << "   "; 
         switch(i) {
             case 0:  cout << "║   BẢNG ĐIỀU KHIỂN    ║"; break;
@@ -278,7 +272,7 @@ void draw() {
                         cout << "[]" << RESET;
                     }
                 }
-                cout << "             ║"; // 13 khoảng trắng
+                cout << "             ║"; 
                 break;
             }
             case 7:  cout << "║ [A/←]   : Trái       ║"; break;
@@ -336,11 +330,9 @@ void rotateBlock() {
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 4; j++)
             rotated[i][j] = ' ';
-
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 4; j++)
             rotated[j][3 - i] = currentBlock[i][j];
-
     bool collision = false;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
@@ -355,7 +347,6 @@ void rotateBlock() {
         }
         if (collision) break;
     }
-
     if (!collision)
         for (int i = 0; i < 4; i++)
             for (int j = 0; j < 4; j++)
@@ -369,7 +360,7 @@ void hardDrop() {
 }
 
 void spawnBlock() {
-    x = 4; // Căn giữa cho board rộng 10 ô
+    x = 4;
     y = 0; 
     b = nextBlockType;
     for (int i = 0; i < 4; i++)
@@ -381,87 +372,92 @@ void spawnBlock() {
 int main() {
 #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8);
-    system("cls"); // Xóa màn hình ngay khi vào game mới trên Windows
-#else
-    cout << "\033[2J\033[1;1H"; // ANSI clear screen cho Linux/macOS
 #endif
 
-    srand(time(0));
-    loadHighScore(); 
-    initBoard();
-    spawnBlock();
+    while (true) { // VÒNG LẶP CHƠI LẠI
+#ifdef _WIN32
+        system("cls");
+#else
+        cout << "\033[2J\033[1;1H";
+#endif
 
-    int moveTimer = 0;
-    int dropLimit = 12;
+        srand(time(0));
+        loadHighScore(); 
+        initBoard();
+        score = 0;      // Reset điểm
+        totalLines = 0; // Reset hàng
+        spawnBlock();
 
-    while (1) {
-        boardDelBlock();
+        int moveTimer = 0;
+        int dropLimit = 12;
 
-        if (check_kbhit()) {
-            char c = get_input();
-            unsigned char uc = (unsigned char)c;
-            if (uc == 27) {
-                char ar = getArrowKey();
-                if (ar == 'L' && canMove(-1, 0)) x--;
-                if (ar == 'R' && canMove(1, 0)) x++;
-                if (ar == 'U') rotateBlock();
-                if (ar == 'D' && canMove(0, 1)) y++;
-            } else if (uc == 0 || uc == 224) {
-                char ar = getArrowKey();
-                if (ar == 'L' && canMove(-1, 0)) x--;
-                if (ar == 'R' && canMove(1, 0)) x++;
-                if (ar == 'U') rotateBlock();
-                if (ar == 'D' && canMove(0, 1)) y++;
-            }
-            else {
-                if ((c == 'a' || c == 'A') && canMove(-1, 0)) x--;
-                if ((c == 'd' || c == 'D') && canMove(1, 0)) x++;
-                if ((c == 's' || c == 'S') && canMove(0, 1)) y++; 
-                if ((c == 'x' || c == 'X') && canMove(0, 1)) y++;
-                if ((c == 'w' || c == 'W')) rotateBlock();
-                if (c == ' ') hardDrop();
-                if (c == 'p' || c == 'P') paused = !paused;
-                if (c == 'q' || c == 'Q') break;
-            }
-        }
-
-        if (!paused) {
-            moveTimer++;
-            if (moveTimer >= dropLimit) {
-                if (canMove(0, 1)) {
-                    y++;
+        while (1) { // VÒNG LẶP GAME CHÍNH
+            boardDelBlock();
+            if (check_kbhit()) {
+                char c = get_input();
+                unsigned char uc = (unsigned char)c;
+                if (uc == 27 || uc == 0 || uc == 224) {
+                    char ar = getArrowKey();
+                    if (ar == 'L' && canMove(-1, 0)) x--;
+                    if (ar == 'R' && canMove(1, 0)) x++;
+                    if (ar == 'U') rotateBlock();
+                    if (ar == 'D' && canMove(0, 1)) y++;
                 } else {
-                    block2Board();
-                    int lines = removeLine();
-                    if (lines > 0) {
-                        score += calcScore(lines);
-                        totalLines += lines;
-                        if (score > highScore) highScore = score;
-                        dropLimit -= lines;
-                        if (dropLimit < 1) dropLimit = 1;
-                    }
-                    spawnBlock();
-                    if (!canMove(0, 0)) break;
+                    if ((c == 'a' || c == 'A') && canMove(-1, 0)) x--;
+                    if ((c == 'd' || c == 'D') && canMove(1, 0)) x++;
+                    if ((c == 's' || c == 'S' || c == 'x' || c == 'X') && canMove(0, 1)) y++; 
+                    if ((c == 'w' || c == 'W')) rotateBlock();
+                    if (c == ' ') hardDrop();
+                    if (c == 'p' || c == 'P') paused = !paused;
+                    if (c == 'q' || c == 'Q') { saveHighScore(); return 0; }
                 }
-                moveTimer = 0;
             }
+
+            if (!paused) {
+                moveTimer++;
+                if (moveTimer >= dropLimit) {
+                    if (canMove(0, 1)) {
+                        y++;
+                    } else {
+                        block2Board();
+                        int lines = removeLine();
+                        if (lines > 0) {
+                            score += calcScore(lines);
+                            totalLines += lines;
+                            if (score > highScore) highScore = score;
+                            dropLimit -= lines;
+                            if (dropLimit < 1) dropLimit = 1;
+                        }
+                        spawnBlock();
+                        if (!canMove(0, 0)) break; // THUA
+                    }
+                    moveTimer = 0;
+                }
+            }
+            ghostY = getGhostY();
+            block2Board();
+            draw();
+            sleep_ms(30);
         }
+        
+        saveHighScore(); 
 
-        ghostY = getGhostY();
-        block2Board();
-        draw();
-        sleep_ms(30);
+        // HIỆN GAME OVER VÀ ĐỢI BẤM R
+        gotoxy(0, H + 2);
+        cout << WHITE << "╔══════════════════════════════╗" << endl;
+        cout << "║        GAME OVER!            ║" << endl;
+        cout << "║  Kỷ lục:       " << RED    << padLeft(highScore, 8) << WHITE << "      ║" << endl;
+        cout << "║  Điểm của bạn: " << YELLOW << padLeft(score, 8)     << WHITE << "      ║" << endl;
+        cout << "║  Số hàng xoá:  " << GREEN  << padLeft(totalLines, 8)<< WHITE << "      ║" << endl;
+        cout << "╠══════════════════════════════╣" << endl;
+        cout << "║  [R] Chơi lại | [Q] Thoát    ║" << endl;
+        cout << "╚══════════════════════════════╝" << RESET << endl;
+
+        while (true) {
+            char choice = get_input();
+            if (choice == 'r' || choice == 'R') break; // Thoát vòng lặp đợi, quay lại đầu main
+            if (choice == 'q' || choice == 'Q') return 0; // Thoát hẳn
+        }
     }
-    
-    saveHighScore(); 
-
-    gotoxy(0, H + 2);
-    cout << WHITE << "╔══════════════════════════════╗" << endl;
-    cout << "║        GAME OVER!            ║" << endl;
-    cout << "║  Kỷ lục:       " << RED    << padLeft(highScore, 8) << WHITE << "      ║" << endl;
-    cout << "║  Điểm của bạn: " << YELLOW << padLeft(score, 8)     << WHITE << "      ║" << endl;
-    cout << "║  Số hàng xoá:  " << GREEN  << padLeft(totalLines, 8)<< WHITE << "      ║" << endl;
-    cout << "╚══════════════════════════════╝" << RESET << endl;
-
     return 0;
 }
