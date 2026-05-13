@@ -15,7 +15,7 @@
 
 - **Chỉ sửa file được giao**, không đụng file của người khác
 - Mỗi hàm có comment `// TODO` — điền vào đó, không thay đổi chữ ký hàm
-- Tham khảo `tetris_oop.cpp` (bản hoàn chỉnh) nếu bí
+- Tham khảo `frame.cpp` (bản hoàn chỉnh) nếu bí
 
 ## Compile
 
