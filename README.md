@@ -18,7 +18,8 @@ Chào mừng bạn đến với dự án **Tetris**! Đây là phiên bản tái
 
 **1. Clone project:**
 ```bash
-git clone [https://github.com/pnkhp/tetrisgame.git](https://github.com/pnkhp/tetrisgame.git)
+git clone [https://github.com/pnkhp/tetrisgame.git]
+
 cd tetrisgame
 ```
 2. Cài đặt môi trường:
