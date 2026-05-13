@@ -42,16 +42,18 @@ Nếu chạy phiên bản C++:
 g++ frame.cpp -o tetris
 ./tetris
 ```
-🎮 Cách điều khiển
-Phím ← / →: Di chuyển sang trái/phải.
+Để đạt được điểm số cao và xử lý các tình huống gạch rơi nhanh ở Level cao, bạn cần nắm vững hệ thống phím tắt dưới đây:
 
-Phím ↑: Xoay gạch.
+| Phím bấm | Hành động | Chi tiết kỹ thuật |
+| :--- | :--- | :--- |
+| **W** hoặc **↑** | **Xoay khối gạch** | Xoay 90 độ (Có hỗ trợ Wall-kick để xoay khi sát tường). |
+| **A** hoặc **←** | **Sang trái** | Di chuyển khối gạch sang trái 1 ô (Giữ phím để di chuyển liên tục). |
+| **D** hoặc **→** | **Sang phải** | Di chuyển khối gạch sang phải 1 ô (Giữ phím để di chuyển liên tục). |
+| **X** hoặc **↓** | **Rơi nhanh** | Kích hoạt **Soft Drop** để tăng tốc độ rơi của khối gạch. |
+| **Space** (Dấu cách) | **Rơi tức thì** | Kích hoạt **Hard Drop**, đưa khối gạch xuống vị trí thấp nhất ngay lập tức. |
+| **P** | **Tạm dừng** | Tạm dừng (Pause) hoặc Tiếp tục (Resume) trạng thái trò chơi. |
+| **Q** hoặc **Esc** | **Thoát** | Thoát trò chơi an toàn và lưu kỷ lục vào file hệ thống. |
 
-Phím ↓: Rơi nhanh (Soft Drop).
-
-Phím Space: Rơi tức thì (Hard Drop).
-
-Phím P: Tạm dừng (Pause).
 
 🧩 Cấu trúc Code cần lưu ý (Tiểu tiết quan trọng)
 Ma trận Board (Grid): Trái tim của game. Sử dụng mảng 2 chiều để map chính xác tọa độ trạng thái các ô vuông. Đòi hỏi quản lý cấp phát/giải phóng bộ nhớ chặt chẽ (với C++) để tránh memory leak.
