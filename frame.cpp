@@ -182,16 +182,10 @@ void block2Board() {
                 board[y+i][x+j] = currentBlock[i][j];
 }
 
+bool canMove(int dx, int dy);
+
 bool canPlaceAt(int testX, int testY) {
-    for (int i = 0 ; i < 4 ; i++)
-        for (int j = 0 ; j < 4 ; j++)
-            if (currentBlock[i][j] != ' ') {
-                int tx = testX + j;
-                int ty = testY + i;
-                if (tx < 1 || tx >= W - 1 || ty >= H - 1) return false;
-                if (board[ty][tx] != ' ') return false;
-            }
-    return true;
+    return canMove(testX - x, testY - y);
 }
 
 int getGhostY() {
