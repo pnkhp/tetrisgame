@@ -40,7 +40,7 @@ python main.py
 Nếu chạy phiên bản C++:
 
 ```bash
-g++ frame.cpp -o tetris
+g++ src/*.cpp src/core/*.cpp src/system/*.cpp -o tetris
 ./tetris
 ```
 Để đạt được điểm số cao và xử lý các tình huống gạch rơi nhanh ở Level cao, bạn cần nắm vững hệ thống phím tắt dưới đây:

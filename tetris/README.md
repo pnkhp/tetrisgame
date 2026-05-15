@@ -20,7 +20,7 @@
 ## Compile
 
 ```bash
-g++ -std=c++14 -o tetris main.cpp CBlock.cpp CBoard.cpp CScoreManager.cpp CRenderer.cpp CInput.cpp CGame.cpp
+g++ src/*.cpp src/core/*.cpp src/system/*.cpp -o tetris
 ./tetris
 ```
 
