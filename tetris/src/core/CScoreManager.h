@@ -3,7 +3,7 @@
 //  CScoreManager.h  –  Người làm: Long Nhật
 //  Quản lý điểm số, kỷ lục, đọc/ghi file
 // ╚══════════════════════════════════════════╝
-#include "common.h"
+#include "../common.h"
 
 class CScoreManager {
 public:

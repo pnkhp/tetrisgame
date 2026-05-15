@@ -3,7 +3,7 @@
 //  CBlock.h  –  Người làm: Thuận
 //  Quản lý hình dạng và phép xoay của khối
 // ╚══════════════════════════════════════════╝
-#include "common.h"
+#include "../common.h"
 
 class CBlock {
 public:

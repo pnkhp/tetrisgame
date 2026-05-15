@@ -3,7 +3,7 @@
 //  CInput.h  –  Người làm: Hồng Phúc
 //  Xử lý bàn phím và sleep, tách biệt Windows/Linux
 // ╚══════════════════════════════════════════╝
-#include "common.h"
+#include "../common.h"
 
 class CInput {
 public:

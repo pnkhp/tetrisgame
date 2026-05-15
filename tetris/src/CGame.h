@@ -3,10 +3,10 @@
 //  CGame.h  –  Người làm: Hoàng Nhật
 //  Vòng lặp chính, túi 7-bag, kết nối tất cả
 // ╚══════════════════════════════════════════╝
-#include "CBoard.h"
-#include "CScoreManager.h"
-#include "CRenderer.h"
-#include "CInput.h"
+#include "core/CBoard.h"
+#include "core/CScoreManager.h"
+#include "system/CRenderer.h"
+#include "system/CInput.h"
 
 class CGame {
 public:

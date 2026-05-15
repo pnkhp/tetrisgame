@@ -3,8 +3,8 @@
 //  CRenderer.h  –  Người làm: Linh
 //  Toàn bộ logic vẽ lên terminal
 // ╚══════════════════════════════════════════╝
-#include "CBoard.h"
-#include "CScoreManager.h"
+#include "../core/CBoard.h"
+#include "../core/CScoreManager.h"
 #include <string>
 
 class CRenderer {
