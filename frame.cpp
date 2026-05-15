@@ -41,8 +41,10 @@ char blocks[][4][4] = {
         {{' ',' ',' ',' '}, {' ',' ','L',' '}, {'L','L','L',' '}, {' ',' ',' ',' '}}
 };
 char currentBlock[4][4];
+char nextBlock[4][4];
 
-int x, y, b;
+// Conflict 1 resolved: giữ ghostY từ ui/ux, giữ giá trị khởi tạo từ main
+int x = 4, y = 0, b = 1;
 int ghostY = 0;
 int nextBlockType = 1;
 int score = 0;
@@ -211,9 +213,10 @@ void initBoard() {
 
 void draw() {
     gotoxy(0,0);
+    // Vẽ khung trên cùng
     cout << WHITE << "╔═";
     for (int j = 1; j < W - 1; j++) cout << "══";
-    cout << "═╗   ╔══════════════════════╗" << RESET << endl;
+    cout << "═╗   ╔══════════════════════╗   ╔══════════╗" << RESET << endl;
 
     for (int i = 0 ; i < H ; i++){
         for (int j = 0 ; j < W ; j++){
@@ -238,6 +241,8 @@ void draw() {
                 }
             }
         }
+
+        // Vẽ Bảng Điều Khiển (Giữa)
         cout << "   "; 
         switch(i) {
             case 0:  cout << "║   BẢNG ĐIỀU KHIỂN    ║"; break;
@@ -284,6 +289,71 @@ void draw() {
             case 19: cout << "║ Hàng : " << GREEN  << padLeft(totalLines, 13) << RESET << " ║"; break;
             case 20: cout << "╚══════════════════════╝"; break;
             default: cout << "                        "; break;
+        }
+
+        // Vẽ Khung Block Tiếp Theo (Phải)
+        cout << "   ";
+        switch(i) {
+            case 0:  cout << "║  BLOCK   ║"; break;
+            case 1:  cout << "║          ║"; break;
+            case 2:  {
+                cout << "║ ";
+                for (int j = 0; j < 4; j++) {
+                    if (nextBlock[0][j] != ' ') {
+                        applyColor(nextBlock[0][j]);
+                        cout << "[]";
+                        cout << RESET;
+                    } else {
+                        cout << "  ";
+                    }
+                }
+                cout << " ║";
+                break;
+            }
+            case 3:  {
+                cout << "║ ";
+                for (int j = 0; j < 4; j++) {
+                    if (nextBlock[1][j] != ' ') {
+                        applyColor(nextBlock[1][j]);
+                        cout << "[]";
+                        cout << RESET;
+                    } else {
+                        cout << "  ";
+                    }
+                }
+                cout << " ║";
+                break;
+            }
+            case 4:  {
+                cout << "║ ";
+                for (int j = 0; j < 4; j++) {
+                    if (nextBlock[2][j] != ' ') {
+                        applyColor(nextBlock[2][j]);
+                        cout << "[]";
+                        cout << RESET;
+                    } else {
+                        cout << "  ";
+                    }
+                }
+                cout << " ║";
+                break;
+            }
+            case 5:  {
+                cout << "║ ";
+                for (int j = 0; j < 4; j++) {
+                    if (nextBlock[3][j] != ' ') {
+                        applyColor(nextBlock[3][j]);
+                        cout << "[]";
+                        cout << RESET;
+                    } else {
+                        cout << "  ";
+                    }
+                }
+                cout << " ║";
+                break;
+            }
+            case 6:  cout << "╚══════════╝"; break;
+            default: cout << "            "; break;
         }
         cout << endl;
     }
@@ -353,6 +423,28 @@ void hardDrop() {
     }
 }
 
+int bag[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+int bagIndex = 8;
+
+void updateNextBlock() {
+    if (bagIndex >= 8) {
+        for(int i=0; i<8; i++) bag[i] = i;
+        for (int i = 7; i > 0; i--) {
+            int j = rand() % (i + 1);
+            swap(bag[i], bag[j]);
+        }
+        bagIndex = 0;
+    }
+    
+    nextBlockType = bag[bagIndex];
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            nextBlock[i][j] = blocks[nextBlockType][i][j];
+        }
+    }
+}
+
+// Conflict 3 resolved: dùng bag system từ main, bỏ rand() % 8
 void spawnBlock() {
     x = 4;
     y = 0; 
@@ -360,7 +452,8 @@ void spawnBlock() {
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 4; j++)
             currentBlock[i][j] = blocks[b][i][j];
-    nextBlockType = rand() % 8;
+    bagIndex++;
+    updateNextBlock();
 }
 
 int main() {
@@ -368,6 +461,11 @@ int main() {
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
+    srand(time(0));
+    loadHighScore();
+
+    // Conflict 4 resolved: giữ vòng lặp "chơi lại" từ ui/ux,
+    // tích hợp init đầy đủ (srand đã gọi trước vòng lặp)
     while (true) { // VÒNG LẶP CHƠI LẠI
 #ifdef _WIN32
         system("cls");
@@ -375,11 +473,11 @@ int main() {
         cout << "\033[2J\033[1;1H";
 #endif
 
-        srand(time(0));
-        loadHighScore(); 
         initBoard();
-        score = 0;      // Reset điểm
-        totalLines = 0; // Reset hàng
+        score = 0;
+        totalLines = 0;
+        bagIndex = 8;       // reset bag để xáo bài lại
+        updateNextBlock();
         spawnBlock();
 
         int moveTimer = 0;
@@ -399,7 +497,7 @@ int main() {
                 } else {
                     if ((c == 'a' || c == 'A') && canMove(-1, 0)) x--;
                     if ((c == 'd' || c == 'D') && canMove(1, 0)) x++;
-                    if ((c == 's' || c == 'S' || c == 'x' || c == 'X') && canMove(0, 1)) y++; 
+                    if ((c == 's' || c == 'S' || c == 'x' || c == 'X') && canMove(0, 1)) y++;
                     if ((c == 'w' || c == 'W')) rotateBlock();
                     if (c == ' ') hardDrop();
                     if (c == 'p' || c == 'P') paused = !paused;
@@ -449,7 +547,7 @@ int main() {
 
         while (true) {
             char choice = get_input();
-            if (choice == 'r' || choice == 'R') break; // Thoát vòng lặp đợi, quay lại đầu main
+            if (choice == 'r' || choice == 'R') break; // Quay lại đầu vòng lặp chơi lại
             if (choice == 'q' || choice == 'Q') return 0; // Thoát hẳn
         }
     }
