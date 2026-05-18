@@ -19,8 +19,6 @@ Chào mừng bạn đến với dự án **Tetris**! Đây là phiên bản tái
 **1. Clone project:**
 ```bash
 git clone https://github.com/pnkhp/tetrisgame.git
-
-cd tetrisgame/tetris
 ```
 2. Cài đặt môi trường:
 
@@ -35,13 +33,14 @@ pip install pygame
 Nếu chạy phiên bản Python:
 
 ```bash
+cd tetris/game
 python main.py
 ```
 Nếu chạy phiên bản C++:
 
 ```bash
-g++ src/*.cpp src/core/*.cpp src/system/*.cpp -o tetris
-./tetris
+cd tetrisgame/tetris
+g++ src/*.cpp src/core/*.cpp src/system/*.cpp -o tetris && ./tetris
 ```
 Để đạt được điểm số cao và xử lý các tình huống gạch rơi nhanh ở Level cao, bạn cần nắm vững hệ thống phím tắt dưới đây:
 
