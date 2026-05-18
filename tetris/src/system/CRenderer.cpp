@@ -39,13 +39,11 @@ void CRenderer::draw(const CBoard& board,
                      const CScoreManager& score,
                      bool paused) const {
     gotoxy(0, 0);
-    // Vẽ khung trên cùng
     std::cout << WHITE << "╔═";
     for (int j = 1; j < BOARD_W - 1; j++) std::cout << "══";
     std::cout << "═╗   ╔══════════════════════╗   ╔══════════╗" << RESET << "\n";
 
     for (int i = 0 ; i < BOARD_H ; i++){
-        // Vẽ bàn cờ (Trái)
         for (int j = 0 ; j < BOARD_W ; j++){
             if (board.grid[i][j] == '#') {
                 std::cout << WHITE;
@@ -63,7 +61,6 @@ void CRenderer::draw(const CBoard& board,
             }
         }
 
-        // Vẽ Bảng Điều Khiển (Giữa)
         std::cout << "   "; 
         switch(i) {
             case 0:  std::cout << "║   BẢNG ĐIỀU KHIỂN    ║"; break;
@@ -78,9 +75,9 @@ void CRenderer::draw(const CBoard& board,
             case 9:  std::cout << "╠══════════════════════╣"; break;
             case 10: std::cout << "║      BẢNG ĐIỂM       ║"; break;
             case 11: std::cout << "╠══════════════════════╣"; break;
-            case 12: std::cout << "║ K.Lục: " << RED    << padLeft(score.highScore, 13) << RESET << " ║"; break;
-            case 13: std::cout << "║ Điểm : " << YELLOW << padLeft(score.score, 13)     << RESET << " ║"; break;
-            case 14: std::cout << "║ Hàng : " << GREEN  << padLeft(score.totalLines, 13) << RESET << " ║"; break;
+            case 12: std::cout << "║ K.Lục: " << RED    << padLeft(score.getHighScore(), 13) << RESET << " ║"; break;
+            case 13: std::cout << "║ Điểm : " << YELLOW << padLeft(score.getScore(), 13)     << RESET << " ║"; break;
+            case 14: std::cout << "║ Hàng : " << GREEN  << padLeft(score.getTotalLines(), 13) << RESET << " ║"; break;
             case 15: std::cout << "╠══════════════════════╣"; break;
             case 16: 
                 if (paused) std::cout << "║ TT: " << RED << "   TẠM DỪNG    " << RESET << " ║";
@@ -92,7 +89,6 @@ void CRenderer::draw(const CBoard& board,
             default: std::cout << "                        "; break;
         }
 
-        // Vẽ Khung Block Tiếp Theo (Phải)
         std::cout << "   ";
         switch(i) {
             case 0:  std::cout << "║  BLOCK   ║"; break;
@@ -123,8 +119,8 @@ void CRenderer::drawGameOver(const CScoreManager& score) const {
     gotoxy(0, BOARD_H + 2);
     std::cout << WHITE << "╔══════════════════════════════╗\n";
     std::cout << "║        GAME OVER!            ║\n";
-    std::cout << "║  Kỷ lục:       " << RED    << padLeft(score.highScore, 8) << WHITE << "      ║\n";
-    std::cout << "║  Điểm của bạn: " << YELLOW << padLeft(score.score, 8)     << WHITE << "      ║\n";
-    std::cout << "║  Số hàng xoá:  " << GREEN  << padLeft(score.totalLines, 8)<< WHITE << "      ║\n";
+    std::cout << "║  Kỷ lục:       " << RED    << padLeft(score.getHighScore(), 8) << WHITE << "      ║\n";
+    std::cout << "║  Điểm của bạn: " << YELLOW << padLeft(score.getScore(), 8)     << WHITE << "      ║\n";
+    std::cout << "║  Số hàng xoá:  " << GREEN  << padLeft(score.getTotalLines(), 8)<< WHITE << "      ║\n";
     std::cout << "╚══════════════════════════════╝" << RESET << "\n";
 }

@@ -20,7 +20,7 @@ Chào mừng bạn đến với dự án **Tetris**! Đây là phiên bản tái
 ```bash
 git clone https://github.com/pnkhp/tetrisgame.git
 
-cd tetrisgame
+cd tetrisgame/tetris
 ```
 2. Cài đặt môi trường:
 
