@@ -6,11 +6,12 @@
 #include "../common.h"
 
 class CScoreManager {
-public:
-    int score;       // Điểm hiện tại
-    int highScore;   // Kỷ lục
-    int totalLines;  // Tổng số hàng đã xóa
+private:
+    int score;
+    int highScore;
+    int totalLines;
 
+public:
     CScoreManager();
 
     // Đọc kỷ lục từ file (nếu không có thì highScore giữ nguyên 0)
@@ -30,4 +31,10 @@ public:
     // TODO: score += calcScore(lines), totalLines += lines
     //       nếu score > highScore thì cập nhật highScore
     void addLines(int lines);
+
+    // Các hàm getter hỗ trợ cho CRenderer và CGame lấy dữ liệu (không làm thay đổi chữ ký hàm gốc)
+    int getScore() const { return score; }
+    int getHighScore() const { return highScore; }
+    int getTotalLines() const { return totalLines; }
+    void resetSession() { score = 0; totalLines = 0; }
 };
