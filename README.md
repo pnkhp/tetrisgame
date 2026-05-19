@@ -33,7 +33,7 @@ pip install pygame
 Nếu chạy phiên bản Python:
 
 ```bash
-cd tetris/game
+cd tetrisgame
 python main.py
 ```
 Nếu chạy phiên bản C++:
