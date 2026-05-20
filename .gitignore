@@ -1,3 +1,5 @@
+.venv/
+game
 tetris
 __pycache__/
 highscore.txt
